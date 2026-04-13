@@ -5,17 +5,8 @@ use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Middleware\AdminAuthenticate;
 
-// ════════════════════════════════════════════════════════════
-// PUBLIC ROUTES - Form Pendaftaran Kandidat
-// ════════════════════════════════════════════════════════════
-
-// Route::get('/', function () {
-//     return redirect()->route('candidate.register');
-// });
-
-Route::get('/', function () {
-    return view('welcome');
-});
+// ── Public ──────────────────────────────────────────────────
+Route::get('/', fn() => redirect()->route('candidate.register'));
 
 Route::prefix('daftar')->name('candidate.')->group(function () {
     Route::get('/',       [CandidateController::class, 'create'])->name('register');
@@ -23,26 +14,36 @@ Route::prefix('daftar')->name('candidate.')->group(function () {
     Route::get('/sukses', [CandidateController::class, 'success'])->name('success');
 });
 
-// ════════════════════════════════════════════════════════════
-// ADMIN AUTH ROUTES
-// ════════════════════════════════════════════════════════════
-
+// ── Admin ────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login',  [AdminController::class, 'loginForm'])->name('login');
     Route::post('/login', [AdminController::class, 'login'])->name('login.post');
 
-    // Protected admin routes
     Route::middleware(AdminAuthenticate::class)->group(function () {
         Route::post('/logout',   [AdminController::class, 'logout'])->name('logout');
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
         Route::get('/export',    [AdminController::class, 'exportCsv'])->name('export');
 
         Route::prefix('kandidat/{candidate}')->name('candidate.')->group(function () {
-            Route::get('/',                [AdminController::class, 'show'])->name('show');
-            Route::post('/status',         [AdminController::class, 'updateStatus'])->name('status');
-            Route::get('/download/ktp',    [AdminController::class, 'downloadKtp'])->name('download.ktp');
-            Route::get('/download/fm-cert',[AdminController::class, 'downloadFmCert'])->name('download.fm');
-            Route::get('/download/hm-cert',[AdminController::class, 'downloadHmCert'])->name('download.hm');
+            Route::get('/',            [AdminController::class, 'show'])->name('show');
+            Route::post('/status',     [AdminController::class, 'updateStatus'])->name('status');
+
+            // Downloads
+            Route::get('/dl/ktp',         [AdminController::class, 'downloadKtp'])->name('download.ktp');
+            Route::get('/dl/fm-cert',     [AdminController::class, 'downloadFmCert'])->name('download.fm');
+            Route::get('/dl/hm-cert',     [AdminController::class, 'downloadHmCert'])->name('download.hm');
+            Route::get('/dl/10k-cert',    [AdminController::class, 'download10kCert'])->name('download.10k');
+            Route::get('/dl/5k-cert',     [AdminController::class, 'download5kCert'])->name('download.5k');
+            Route::get('/dl/trail-cert',  [AdminController::class, 'downloadTrailCert'])->name('download.trail');
+            Route::get('/dl/mileage-dec', [AdminController::class, 'downloadMileageDec'])->name('download.mileage.dec');
+            Route::get('/dl/mileage-jan', [AdminController::class, 'downloadMileageJan'])->name('download.mileage.jan');
+            Route::get('/dl/mileage-feb', [AdminController::class, 'downloadMileageFeb'])->name('download.mileage.feb');
+            Route::get('/dl/mileage-mar', [AdminController::class, 'downloadMileageMar'])->name('download.mileage.mar');
+            Route::get('/dl/bt-fm',       [AdminController::class, 'downloadBtFm'])->name('download.bt.fm');
+            Route::get('/dl/bt-hm',       [AdminController::class, 'downloadBtHm'])->name('download.bt.hm');
+            Route::get('/dl/bt-10k',      [AdminController::class, 'downloadBt10k'])->name('download.bt.10k');
+            Route::get('/dl/bt-5k',       [AdminController::class, 'downloadBt5k'])->name('download.bt.5k');
+            Route::get('/dl/waiver',      [AdminController::class, 'downloadWaiver'])->name('download.waiver');
         });
     });
 });

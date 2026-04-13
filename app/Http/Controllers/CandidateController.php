@@ -4,77 +4,99 @@ namespace App\Http\Controllers;
 
 use App\Models\Candidate;
 use App\Http\Requests\CandidateRegistrationRequest;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class CandidateController extends Controller
 {
-    /**
-     * Tampilkan form pendaftaran
-     */
     public function create()
     {
         return view('candidate.register');
     }
 
-    /**
-     * Proses submit form pendaftaran
-     */
     public function store(CandidateRegistrationRequest $request)
     {
         $data = $request->validated();
 
-        // ── Upload KTP ───────────────────────────────────────
-        if ($request->hasFile('ktp_file')) {
-            $data['ktp_file'] = $request->file('ktp_file')
-                ->store('ktp', 'private'); // simpan di storage/app/private/ktp/
-        }
+        // ── Helper: simpan file ke disk private ──────────────────
+        $upload = fn(string $field, string $folder) =>
+            $request->hasFile($field)
+                ? $request->file($field)->store($folder, 'private')
+                : null;
 
-        // ── Upload Sertifikat Full Marathon ──────────────────
-        if ($request->hasFile('fm_certificate')) {
-            $data['fm_certificate'] = $request->file('fm_certificate')
-                ->store('certificates/fm', 'private');
-        }
+        // ── Section 1: KTP ───────────────────────────────────────
+        $data['ktp_file'] = $upload('ktp_file', 'ktp');
 
-        // ── Upload Sertifikat Half Marathon ──────────────────
-        if ($request->hasFile('hm_certificate')) {
-            $data['hm_certificate'] = $request->file('hm_certificate')
-                ->store('certificates/hm', 'private');
-        }
-
-        // ── Normalize boolean fields ─────────────────────────
+        // ── Section 2 & 3: FM / HM ───────────────────────────────
         $data['is_full_marathon'] = $data['is_full_marathon'] === 'pernah';
         $data['is_half_marathon'] = $data['is_half_marathon'] === 'pernah';
 
-        // ── Bersihkan data yang tidak relevan ─────────────────
-        if (!$data['is_full_marathon']) {
-            $data['fm_event']       = null;
-            $data['fm_year']        = null;
-            $data['fm_certificate'] = $data['fm_certificate'] ?? null;
+        if ($data['is_full_marathon']) {
+            $data['fm_certificate'] = $upload('fm_certificate', 'certs/fm');
+        } else {
+            $data['fm_event'] = $data['fm_year'] = $data['fm_certificate'] = null;
         }
 
-        if (!$data['is_half_marathon']) {
-            $data['hm_event']       = null;
-            $data['hm_year']        = null;
-            $data['hm_certificate'] = $data['hm_certificate'] ?? null;
+        if ($data['is_half_marathon']) {
+            $data['hm_certificate'] = $upload('hm_certificate', 'certs/hm');
+        } else {
+            $data['hm_event'] = $data['hm_year'] = $data['hm_certificate'] = null;
         }
 
-        // ── Simpan ke database ───────────────────────────────
+        // ── Section 4: 10K ────────────────────────────────────────
+        if ($data['is_10k'] === 'pernah') {
+            $data['race_10k_certificate'] = $upload('race_10k_certificate', 'certs/10k');
+        } else {
+            $data['race_10k_event'] = $data['race_10k_year'] = $data['race_10k_certificate'] = null;
+        }
+
+        // ── Section 5: 5K ─────────────────────────────────────────
+        if ($data['is_5k'] === 'pernah') {
+            $data['race_5k_certificate'] = $upload('race_5k_certificate', 'certs/5k');
+        } else {
+            $data['race_5k_event'] = $data['race_5k_year'] = $data['race_5k_certificate'] = null;
+        }
+
+        // ── Section 6: Trail ──────────────────────────────────────
+        if (($data['trail_status'] ?? '') === 'trail') {
+            $data['trail_certificate'] = $upload('trail_certificate', 'certs/trail');
+        } else {
+            $data['trail_event'] = $data['trail_year'] = $data['trail_certificate'] = null;
+        }
+
+        // ── Section 7: Mileage Graphs ─────────────────────────────
+        $data['mileage_dec_graph'] = $upload('mileage_dec_graph', 'mileage');
+        $data['mileage_jan_graph'] = $upload('mileage_jan_graph', 'mileage');
+        $data['mileage_feb_graph'] = $upload('mileage_feb_graph', 'mileage');
+        $data['mileage_mar_graph'] = $upload('mileage_mar_graph', 'mileage');
+
+        // ── Section 8: Best Time Files ────────────────────────────
+        $data['best_time_fm_file']  = $upload('best_time_fm_file',  'besttime');
+        $data['best_time_hm_file']  = $upload('best_time_hm_file',  'besttime');
+        $data['best_time_10k_file'] = $upload('best_time_10k_file', 'besttime');
+        $data['best_time_5k_file']  = $upload('best_time_5k_file',  'besttime');
+
+        // ── Section 9: Pacer Experience ───────────────────────────
+        $data['is_pacer_experience'] = ($data['is_pacer_experience'] ?? 'tidak') === 'pernah';
+        if (!$data['is_pacer_experience']) {
+            $data['pacer_event_list']    = null;
+            $data['pacer_distance_pace'] = null;
+        }
+
+        // ── Section 12: Waiver ────────────────────────────────────
+        $data['waiver_file']           = $upload('waiver_file', 'waiver');
+        $data['pernyataan_keabsahan']  = (bool) ($data['pernyataan_keabsahan'] ?? false);
+
         Candidate::create($data);
 
         return redirect()->route('candidate.success')
-            ->with('success', 'Pendaftaran berhasil! Data Anda sedang dalam proses verifikasi.');
+            ->with('success', 'Pendaftaran berhasil! Data Anda sedang diverifikasi.');
     }
 
-    /**
-     * Halaman sukses setelah submit
-     */
     public function success()
     {
         if (!session('success')) {
             return redirect()->route('candidate.register');
         }
-
         return view('candidate.success');
     }
 }
