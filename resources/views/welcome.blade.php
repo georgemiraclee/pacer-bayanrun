@@ -392,16 +392,29 @@
 <script>
 /* COUNTDOWN */
 (function(){
-    var target = new Date('2026-04-15T08:00:00+08:00');
+    var target = new Date('2026-04-15T00:00:00+08:00');
     function pad(n){ return String(n).padStart(2,'0'); }
+
     function tick(){
-        var diff = Math.max(0, target - new Date());
+        var now = new Date();
+        var diff = target - now;
+
+        // 🔥 Kalau waktu habis → redirect
+        if (diff <= 0) {
+            window.location.href = "/daftar";
+            return;
+        }
+
+        diff = Math.max(0, diff);
+
         document.getElementById('cd-d').textContent = pad(Math.floor(diff/864e5));
         document.getElementById('cd-h').textContent = pad(Math.floor((diff%864e5)/36e5));
         document.getElementById('cd-m').textContent = pad(Math.floor((diff%36e5)/6e4));
         document.getElementById('cd-s').textContent = pad(Math.floor((diff%6e4)/1e3));
     }
-    tick(); setInterval(tick, 1000);
+
+    tick();
+    setInterval(tick, 1000);
 })();
 
 /* LOADER + REVEAL */
