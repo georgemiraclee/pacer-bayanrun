@@ -646,13 +646,12 @@
         </div>
 
 {{-- ════ SECTION 4 — 10K & 5K (Hanya muncul jika FM & HM 'tidak') ════ --}}
-<div class="card" x-show="fm === 'tidak' && hm === 'tidak'" x-transition>
+<div class="card" x-transition>
     <div class="card-head">
         <div class="card-num">4</div>
         <div class="card-title">Pengalaman 10K & 5K</div>
     </div>
     <div class="card-body">
-        <div class="info-box">💡 Wajib diisi karena Anda belum pernah FM maupun HM.</div>
 
         {{-- Kategori 10K --}}
         <div style="border-bottom:1px solid #F0F0F0; padding-bottom:20px; margin-bottom:20px;">
