@@ -159,7 +159,7 @@ class AdminController extends Controller
 
         $callback = function() use ($candidates) {
             $f = fopen('php://output','w');
-            fputcsv($f, ['ID','NIK','Nama','WhatsApp',' Tgl Lahir','Domisili','Instagram','Strava',
+            fputcsv($f, ['ID','NIK','Nama','Email','WhatsApp',' Tgl Lahir','Domisili','Instagram','Strava',
                 'FM','HM','10K','5K','Mileage Total (km)',
                 'Best FM','Best HM','Best 10K','Best 5K',
                 'Pacer Exp','Komitmen','Izin Keluarga','Status','Daftar']);
