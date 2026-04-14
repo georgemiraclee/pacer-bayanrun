@@ -7,7 +7,11 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Middleware\AdminAuthenticate;
 
 // ── Public ──────────────────────────────────────────────────
-Route::get('/', fn() => redirect()->route('candidate.register'));
+// Route::get('/', fn() => redirect()->route('candidate.register'));
+
+Rote::get('/', function() {
+    return view('welcome');
+})->name('home');
 
 // ── OCR KTP (AJAX endpoint) ──────────────────────────────────
 Route::post('/ocr/ktp', [KtpOcrController::class, 'scan'])->name('ocr.ktp');
