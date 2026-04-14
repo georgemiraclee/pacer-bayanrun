@@ -13,6 +13,7 @@ return new class extends Migration
 
             // ── SECTION 1: Data Pribadi ─────────────────────────────
             $table->string('email')->unique();
+            $table->string('no_hp', 20)->nullable();
             $table->string('nik', 16)->nullable();  // dari OCR KTP
             $table->string('nama');
             $table->date('tanggal_lahir');

@@ -13,6 +13,7 @@ class CandidateRegistrationRequest extends FormRequest
         $rules = [
             // ── Section 1: Data Pribadi ─────────────────────────────
             'email'         => ['required','email:rfc,dns','unique:candidates,email','max:255'],
+            'no_hp'              => ['required','string','min:9','max:20','regex:/^[0-9+\-\s()]+$/'],
             'nik'           => ['nullable','string','digits:16'],
             'nama'          => ['required','string','min:3','max:255'],
             'tanggal_lahir' => ['required','string','max:20'], // format DD-MM-YYYY dari OCR
@@ -129,6 +130,9 @@ class CandidateRegistrationRequest extends FormRequest
             'email.required'          => 'Email wajib diisi.',
             'email.email'             => 'Format email tidak valid.',
             'email.unique'            => 'Email ini sudah terdaftar.',
+           'no_hp.required'          => 'Nomor WhatsApp/telepon wajib diisi.',
+            'no_hp.min'               => 'Nomor telepon minimal 9 digit.',
+            'no_hp.regex'             => 'Format nomor telepon tidak valid.',
             'nama.required'           => 'Nama lengkap wajib diisi.',
             'tanggal_lahir.required'  => 'Tanggal lahir wajib diisi.',
             'domisili.required'       => 'Domisili wajib diisi.',

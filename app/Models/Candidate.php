@@ -12,7 +12,7 @@ class Candidate extends Model
 
     protected $fillable = [
         // Data Pribadi
-        'email', 'nik', 'nama', 'tanggal_lahir', 'domisili', 'alamat',
+        'email', 'nik','no_hp', 'nama', 'tanggal_lahir', 'domisili', 'alamat',
         'ktp_file', 'instagram', 'strava',
         // Full & Half Marathon
         'is_full_marathon', 'fm_event', 'fm_year', 'fm_certificate',

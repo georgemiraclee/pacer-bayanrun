@@ -370,6 +370,7 @@
                 ['NIK',       $candidate->nik ?? '—'],
                 ['Nama',      $candidate->nama],
                 ['Email',     $candidate->email],
+                ['WhatsApp',  $candidate->no_hp ?? '—'],
                 ['Tgl Lahir', $candidate->tanggal_lahir_formatted . ($candidate->usia !== null ? ' ('.$candidate->usia.' thn)' : '')],
                 ['Domisili',  $candidate->domisili],
                 ['Alamat',    $candidate->alamat],
