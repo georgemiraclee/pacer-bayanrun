@@ -30,8 +30,8 @@
         <div style="display:flex; flex-direction:column; gap:16px;">
             @foreach([
                 ['Verifikasi Data', 'Tim panitia akan memverifikasi data dan dokumen yang Anda upload.'],
-                ['Proses Review', 'Proses verifikasi memakan waktu 3–7 hari kerja setelah pendaftaran ditutup.'],
-                ['Pengumuman', 'Hasil seleksi akan diinformasikan melalui email yang Anda daftarkan.'],
+                ['Proses Review', 'Proses verifikasi dan memproses data kandidat setelah pendaftaran ditutup'],
+                ['Pengumuman', 'Hasil seleksi akan diinformasikan melalui akun instagram @bayan_opem.'],
             ] as $i => [$title, $desc])
             <div style="display:flex; gap:14px; align-items:flex-start;">
                 <div style="width:28px; height:28px; background:#E8001E; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">
@@ -49,7 +49,7 @@
     {{-- Contact --}}
     <p style="font-size:12px; color:#BBB; margin-top:28px; animation:fadeUp .5s ease .45s both;">
         Pertanyaan? DM Instagram resmi kami
-        <a href="https://instagram.com/bayanrun" style="color:#E8001E; text-decoration:none; font-weight:500;">@bayanrun</a>
+        <a href="https://instagram.com/bayan_opem" style="color:#E8001E; text-decoration:none; font-weight:500;">@bayan_opem</a>
     </p>
 
     <a href="{{ route('candidate.register') }}"

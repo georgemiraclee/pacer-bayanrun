@@ -522,7 +522,9 @@
 
                 <div class="field">
                     <label class="label">Domisili <span class="req">*</span><span class="hint">(kota/kabupaten)</span></label>
-                    <input type="text" name="domisili" value="{{ old('domisili') }}" placeholder="Samarinda, Kalimantan Timur" class="{{ $errors->has('domisili')?'err':'' }}">
+                    <select name="domisili" id="fieldDomisili" class="{{ $errors->has('domisili')?'err':'' }}" style="width:100%; padding:10px; border-radius:var(--radius-input); border:1.5px solid #DDD;">
+                        <option value="">Pilih Kota/Kabupaten</option>
+                    </select>
                     @error('domisili')<span class="err-msg">{{ $message }}</span>@enderror
                 </div>
 
@@ -643,118 +645,120 @@
             </div>
         </div>
 
-        {{-- ════ SECTION 4 — 10K & 5K (hanya muncul jika FM & HM tidak pernah) ════ --}}
-        <div class="card" x-show="fm==='tidak' && hm==='tidak'" x-transition>
-            <div class="card-head"><div class="card-num">4</div><div class="card-title">Pengalaman 10K & 5K</div></div>
-            <div class="card-body">
-                <div class="info-box">💡 Wajib diisi karena Anda belum pernah FM maupun HM.</div>
+{{-- ════ SECTION 4 — 10K & 5K (Hanya muncul jika FM & HM 'tidak') ════ --}}
+<div class="card" x-show="fm === 'tidak' && hm === 'tidak'" x-transition>
+    <div class="card-head">
+        <div class="card-num">4</div>
+        <div class="card-title">Pengalaman 10K & 5K</div>
+    </div>
+    <div class="card-body">
+        <div class="info-box">💡 Wajib diisi karena Anda belum pernah FM maupun HM.</div>
 
-                {{-- 10K --}}
-                <div style="border-bottom:1px solid #F0F0F0;padding-bottom:20px;">
-                    <div class="field">
-                        <label class="label">Pernah Race 10K? <span class="req">*</span></label>
-                        <div class="radio-group">
-                            @include('candidate._radio', ['name'=>'is_10k','value'=>'pernah','model'=>'r10k','label'=>'Pernah','sub'=>''])
-                            @include('candidate._radio', ['name'=>'is_10k','value'=>'tidak','model'=>'r10k','label'=>'Tidak Pernah','sub'=>''])
-                        </div>
-                        @error('is_10k')<span class="err-msg">{{ $message }}</span>@enderror
-                    </div>
-                    <div class="cond-block" x-show="r10k==='pernah'" x-transition>
-                        <div class="grid-2col field-row">
-                            <div class="field">
-                                <label class="label">Nama Event 10K <span class="req">*</span></label>
-                                <input type="text" name="race_10k_event" value="{{ old('race_10k_event') }}" placeholder="Run For Life 10K 2024">
-                                @error('race_10k_event')<span class="err-msg">{{ $message }}</span>@enderror
-                            </div>
-                            <div class="field">
-                                <label class="label">Tahun <span class="req">*</span></label>
-                                <input type="number" name="race_10k_year" value="{{ old('race_10k_year') }}" placeholder="{{ date('Y') }}" min="2000" max="{{ date('Y') }}">
-                                @error('race_10k_year')<span class="err-msg">{{ $message }}</span>@enderror
-                            </div>
-                        </div>
-                        <div class="field">
-                            <label class="label">Upload Sertifikat 10K <span class="hint">(jika ada)</span></label>
-                            <label for="cert_10k" class="upload-zone">
-                                <input type="file" id="cert_10k" name="race_10k_certificate" accept=".jpg,.jpeg,.png" style="display:none" onchange="UPLOAD.fileChosen('10k', this)">
-                                <div class="upload-zone-icon">
-                                    <svg id="uz-up-10k" width="18" height="18" fill="none" stroke="var(--primary)" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                                    <svg id="uz-ok-10k" width="18" height="18" fill="none" stroke="#16A34A" stroke-width="2.5" viewBox="0 0 24 24" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                                </div>
-                                <p class="upload-zone-name" id="uz-name-10k">Upload Sertifikat 10K (Opsional)</p>
-                            </label>
-                            <div class="upload-thumb-wrap" id="uz-thumb-wrap-10k">
-                                <img id="uz-thumb-10k" src="" alt="Preview" class="upload-thumb">
-                                <button type="button" class="upload-thumb-remove" onclick="UPLOAD.remove('10k')">
-                                    <svg width="10" height="10" fill="none" stroke="#fff" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+        {{-- Kategori 10K --}}
+        <div style="border-bottom:1px solid #F0F0F0; padding-bottom:20px; margin-bottom:20px;">
+            <div class="field">
+                <label class="label">Pernah Race 10K? <span class="req">*</span></label>
+                <div class="radio-group">
+                    {{-- Input radio standar agar mudah divalidasi 'required' oleh browser/laravel --}}
+                    <label class="radio-opt">
+                        <input type="radio" name="is_10k" value="pernah" x-model="r10k" :required="fm === 'tidak' && hm === 'tidak'">
+                        <div class="radio-pip"></div>
+                        <div class="radio-label">Pernah</div>
+                    </label>
+                    <label class="radio-opt">
+                        <input type="radio" name="is_10k" value="tidak" x-model="r10k" :required="fm === 'tidak' && hm === 'tidak'">
+                        <div class="radio-pip"></div>
+                        <div class="radio-label">Tidak Pernah</div>
+                    </label>
                 </div>
+                @error('is_10k')<span class="err-msg">{{ $message }}</span>@enderror
+            </div>
 
-                {{-- 5K --}}
-                <div style="padding-top:4px;">
+            <div class="cond-block" x-show="r10k === 'pernah'" x-transition>
+                <div class="grid-2col field-row">
                     <div class="field">
-                        <label class="label">Pernah Race 5K? <span class="req">*</span></label>
-                        <div class="radio-group">
-                            @include('candidate._radio', ['name'=>'is_5k','value'=>'pernah','model'=>'r5k','label'=>'Pernah','sub'=>''])
-                            @include('candidate._radio', ['name'=>'is_5k','value'=>'tidak','model'=>'r5k','label'=>'Tidak Pernah','sub'=>''])
-                        </div>
-                        @error('is_5k')<span class="err-msg">{{ $message }}</span>@enderror
+                        <label class="label">Nama Event 10K</label>
+                        <input type="text" name="race_10k_event" value="{{ old('race_10k_event') }}" placeholder="Run For Life 10K">
                     </div>
-                    <div class="cond-block" x-show="r5k==='pernah'" x-transition>
-                        <div class="grid-2col field-row">
-                            <div class="field">
-                                <label class="label">Nama Event 5K <span class="req">*</span></label>
-                                <input type="text" name="race_5k_event" value="{{ old('race_5k_event') }}" placeholder="Fun Run 5K 2024">
-                                @error('race_5k_event')<span class="err-msg">{{ $message }}</span>@enderror
-                            </div>
-                            <div class="field">
-                                <label class="label">Tahun <span class="req">*</span></label>
-                                <input type="number" name="race_5k_year" value="{{ old('race_5k_year') }}" placeholder="{{ date('Y') }}" min="2000" max="{{ date('Y') }}">
-                                @error('race_5k_year')<span class="err-msg">{{ $message }}</span>@enderror
-                            </div>
-                        </div>
-                        <div class="field">
-                            <label class="label">Upload Sertifikat 5K <span class="hint">(jika ada)</span></label>
-                            <label for="cert_5k" class="upload-zone">
-                                <input type="file" id="cert_5k" name="race_5k_certificate" accept=".jpg,.jpeg,.png" style="display:none" onchange="UPLOAD.fileChosen('5k', this)">
-                                <div class="upload-zone-icon">
-                                    <svg id="uz-up-5k" width="18" height="18" fill="none" stroke="var(--primary)" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                                    <svg id="uz-ok-5k" width="18" height="18" fill="none" stroke="#16A34A" stroke-width="2.5" viewBox="0 0 24 24" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                                </div>
-                                <p class="upload-zone-name" id="uz-name-5k">Upload Sertifikat 5K (Opsional)</p>
-                            </label>
-                            <div class="upload-thumb-wrap" id="uz-thumb-wrap-5k">
-                                <img id="uz-thumb-5k" src="" alt="Preview" class="upload-thumb">
-                                <button type="button" class="upload-thumb-remove" onclick="UPLOAD.remove('5k')">
-                                    <svg width="10" height="10" fill="none" stroke="#fff" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>
-                            </div>
-                        </div>
+                    <div class="field">
+                        <label class="label">Tahun</label>
+                        <input type="number" name="race_10k_year" value="{{ old('race_10k_year') }}" placeholder="2024">
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- ════ SECTION 4B — TRAIL ════ --}}
-        <div class="card" x-show="fm==='tidak' && hm==='tidak'" x-transition>
-            <div class="card-head" style="background:#1A1A2E;"><div class="card-num" style="background:#4F46E5;">4B</div><div class="card-title">Event Lainnya (Trail / Non-Road Race)</div></div>
+        {{-- Kategori 5K --}}
+        <div>
+            <div class="field">
+                <label class="label">Pernah Race 5K? <span class="req">*</span></label>
+                <div class="radio-group">
+                    <label class="radio-opt">
+                        <input type="radio" name="is_5k" value="pernah" x-model="r5k" :required="fm === 'tidak' && hm === 'tidak'">
+                        <div class="radio-pip"></div>
+                        <div class="radio-label">Pernah</div>
+                    </label>
+                    <label class="radio-opt">
+                        <input type="radio" name="is_5k" value="tidak" x-model="r5k" :required="fm === 'tidak' && hm === 'tidak'">
+                        <div class="radio-pip"></div>
+                        <div class="radio-label">Tidak Pernah</div>
+                    </label>
+                </div>
+                @error('is_5k')<span class="err-msg">{{ $message }}</span>@enderror
+            </div>
+
+            <div class="cond-block" x-show="r5k === 'pernah'" x-transition>
+                <div class="grid-2col field-row">
+                    <div class="field">
+                        <label class="label">Nama Event 5K</label>
+                        <input type="text" name="race_5k_event" value="{{ old('race_5k_event') }}" placeholder="Fun Run 5K">
+                    </div>
+                    <div class="field">
+                        <label class="label">Tahun</label>
+                        <input type="number" name="race_5k_year" value="{{ old('race_5k_year') }}" placeholder="2024">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        {{-- ════ SECTION 4B — EVENT LARI LAINNYA ════ --}}
+        {{-- x-show dihapus agar section ini selalu tampil --}}
+        <div class="card" x-transition>
+            <div class="card-head" style="background:#1A1A2E;">
+                <div class="card-num" style="background:#4F46E5;">4B</div>
+                <div class="card-title" style="color:#fff;">Event Lari Lainnya (Trail / Ultra / Dll)</div>
+            </div>
             <div class="card-body">
-                <div class="info-box">📋 Untuk kandidat yang belum pernah road race manapun.</div>
                 <div class="field">
-                    <label class="label">Status <span class="req">*</span></label>
-                    <div style="display:flex;flex-direction:column;gap:8px;">
-                        @foreach(['trail'=>'Pernah Trail Event','none'=>'Tidak Pernah Event Apapun','skip'=>'Lewati Pertanyaan Ini'] as $val=>$lbl)
-                        <label class="radio-opt"><input type="radio" name="trail_status" value="{{ $val }}" x-model="trailStatus" {{ old('trail_status')===$val?'checked':'' }}><div class="radio-pip"></div><div><div class="radio-label">{{ $lbl }}</div></div></label>
+                    <label class="label">Apakah pernah ikut event lain selain Road Race? <span class="req">*</span></label>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        @foreach(['trail'=>'Pernah (Trail Event / Non-Road Race)','none'=>'Tidak Pernah Event Apapun'] as $val=>$lbl)
+                        <label class="radio-opt">
+                            <input type="radio" name="trail_status" value="{{ $val }}" x-model="trailStatus" {{ old('trail_status')===$val?'checked':'' }}>
+                            <div class="radio-pip"></div>
+                            <div>
+                                <div class="radio-label">{{ $lbl }}</div>
+                            </div>
+                        </label>
                         @endforeach
                     </div>
                 </div>
+
+                {{-- Blok ini hanya muncul jika user memilih 'Pernah' --}}
                 <div class="cond-block" x-show="trailStatus==='trail'" x-transition>
                     <div class="grid-2col field-row">
-                        <div class="field"><label class="label">Nama Event <span class="req">*</span></label><input type="text" name="trail_event" value="{{ old('trail_event') }}" placeholder="Trail Run Borneo 2024"></div>
-                        <div class="field"><label class="label">Tahun <span class="req">*</span></label><input type="number" name="trail_year" value="{{ old('trail_year') }}" placeholder="{{ date('Y') }}" min="2000" max="{{ date('Y') }}"></div>
+                        <div class="field">
+                            <label class="label">Nama Event <span class="req">*</span></label>
+                            <input type="text" name="trail_event" value="{{ old('trail_event') }}" placeholder="Contoh: Trail Run Borneo 2024">
+                        </div>
+                        <div class="field">
+                            <label class="label">Tahun <span class="req">*</span></label>
+                            <input type="number" name="trail_year" value="{{ old('trail_year') }}" placeholder="{{ date('Y') }}" min="2000" max="{{ date('Y') }}">
+                        </div>
                     </div>
+                    
                     <div class="field">
                         <label class="label">Upload Bukti <span class="req">*</span></label>
                         <label for="trail_cert" class="upload-zone">
@@ -763,8 +767,9 @@
                                 <svg id="uz-up-trail" width="18" height="18" fill="none" stroke="var(--primary)" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                                 <svg id="uz-ok-trail" width="18" height="18" fill="none" stroke="#16A34A" stroke-width="2.5" viewBox="0 0 24 24" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                             </div>
-                            <p class="upload-zone-name" id="uz-name-trail">Upload Bukti Event Trail</p>
+                            <p class="upload-zone-name" id="uz-name-trail">Upload Bukti Event</p>
                         </label>
+                        
                         <div class="upload-thumb-wrap" id="uz-thumb-wrap-trail">
                             <img id="uz-thumb-trail" src="" alt="Preview" class="upload-thumb">
                             <button type="button" class="upload-thumb-remove" onclick="UPLOAD.remove('trail')">
@@ -780,6 +785,22 @@
         <div class="card">
             <div class="card-head"><div class="card-num">5</div><div class="card-title">Data Mileage (Desember 2025 — Maret 2026)</div></div>
             <div class="card-body">
+                <div class="mileage-block">
+                <div style="font-size:12px; color:#666; gap 15px; display:flex; align-items:center; margin-bottom:15px;">
+                        Contoh Screenshot Grafik Mileage Strava atau Smart Watch:
+                    </div>
+                <div style="display:flex; gap:15px; margin-bottom:15px; align-items:center;">
+                    <div style="text-align:center;">
+                        <img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVCqtKQF2aT7V7ZnDaECAjDY_RXgGe9QTa2Y2L7wHjbo6wMtZXnCKJjWXC_PFFPI-pVhLGhLE8eXjmRSEtcLtdjMsmYi3oKNLgq-jR0KC6ZNQZussyTD3g5XEAH2J5vKVSaYr77xx5DND_ws35l0kHQtPiozXebsV-EC=s2048?key=Z1pP6rwltK_1EvnFUHo5QA" alt="Strava" style="width:200px; height:200px; border-radius:8px;">
+                        <p style="font-size:10px; font-weight:700;">STRAVA</p>
+                    </div>
+                    <div style="text-align:center;">
+                        <img src="https://lh7-rt.googleusercontent.com/formsz/AN7BsVCAErtFM6hs7Koy0krMVnfrpgdrIfUJBXKTQTsFSK8NViQpPZMKphnTyUxMvyMHvL80uj57NigMnwk0aetL0JVcQhXOht24apgSVunS6Kbfl7RFr40Xh8VSvt_CuCBvVIUvhf1qf-7zL2b36ka41C0HkDbvJ-U5AW54=s2048?key=Z1pP6rwltK_1EvnFUHo5QA" alt="Smart Watch" style="width:200px; height:200px; border-radius:8px;">
+                        <p style="font-size:10px; font-weight:700;">SMART WATCH</p>
+                    </div>
+
+                </div>
+                </div>
                 <div class="info-box">📊 Upload screenshot grafik mileage dari <strong>Strava</strong> atau smartwatch. Isi total jarak dalam <strong>km</strong>. File tidak akan hilang meski ada error validasi.</div>
 
                 @foreach([
@@ -1070,6 +1091,36 @@
 
 @push('scripts')
 <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    const citySelect = document.getElementById('fieldDomisili');
+    const provId = '64'; // ID untuk Kalimantan Timur
+
+    fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${provId}.json`)
+        .then(response => response.json())
+        .then(regencies => {
+            // Kosongkan loading text
+            citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+            
+            regencies.forEach(regency => {
+                let option = document.createElement('option');
+                // value disimpan dalam format Title Case (Contoh: KOTA SAMARINDA)
+                option.value = regency.name; 
+                option.text = regency.name;
+                
+                // Jika ada data lama (old value) dari Laravel, otomatis pilih
+                if(option.value == "{{ old('domisili') }}") {
+                    option.selected = true;
+                }
+                
+                citySelect.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching cities:', error);
+            citySelect.innerHTML = '<option value="">Gagal memuat data</option>';
+        });
+});
 /* ═══════════════════════════════════════════════════════════════
    SHEET
 ═══════════════════════════════════════════════════════════════ */
