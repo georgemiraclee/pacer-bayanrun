@@ -435,7 +435,7 @@
                 </div>
                 <div class="field">
                     <label class="label">Nomor WhatsApp / Telepon <span class="req">*</span></label>
-                    <input type="email" 
+                    <input type="text" 
                         name="no_hp" 
                         value="{{ old('no_hp') }}" 
                         placeholder="0812-3456-7890"
