@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Str; // ← tambahkan ini di bagian use
 class AdminController extends Controller
 {
     // ── AUTH ──────────────────────────────────────────────────
@@ -93,20 +93,31 @@ class AdminController extends Controller
         return back()->with('success', "Kandidat {$candidate->nama} berhasil {$label}.");
     }
 
-        private function download(Candidate $candidate, ?string $storedPath, string $prefix)
-        {
-            if (!$storedPath) abort(404);
-
-            $absolutePath = storage_path('app/private/' . $storedPath);
-
-            if (!file_exists($absolutePath)) abort(404);
-
-            $ext = pathinfo($storedPath, PATHINFO_EXTENSION);
-            $safeName = Str::slug($candidate->nama);
-            $filename = "{$prefix}_{$safeName}.{$ext}";
-
-            return response()->download($absolutePath, $filename);
+    private function preview(Candidate $candidate, ?string $storedPath): \Symfony\Component\HttpFoundation\Response
+    {
+        // 1. Cek apakah path ada di database
+        if (empty($storedPath)) {
+            abort(404, 'Path tidak ditemukan di database');
         }
+
+        // 2. Cek apakah file ada di disk 'private'
+        if (!Storage::disk('private')->exists($storedPath)) {
+            // Debug: Jika error, cek log untuk melihat path mana yang dicari
+            Log::error("File tidak ditemukan di disk private: " . $storedPath);
+            abort(404, 'File fisik tidak ditemukan');
+        }
+
+        // 3. Ambil path absolut untuk dikirim sebagai response
+        $absolutePath = Storage::disk('private')->path($storedPath);
+        
+        $ext = strtolower(pathinfo($storedPath, PATHINFO_EXTENSION));
+        $mimeType = $this->getMimeType($ext);
+
+        return response()->file($absolutePath, [
+            'Content-Type'        => $mimeType,
+            'Content-Disposition' => 'inline',
+        ]);
+    }
 
     private function getMimeType(string $ext): string
     {
@@ -118,21 +129,22 @@ class AdminController extends Controller
         };
     }
 
-    public function downloadKtp(Candidate $c)        { return $this->download($c, $c->ktp_file,            'KTP'); }
-    public function downloadFmCert(Candidate $c)     { return $this->download($c, $c->fm_certificate,      'Sertifikat_FM'); }
-    public function downloadHmCert(Candidate $c)     { return $this->download($c, $c->hm_certificate,      'Sertifikat_HM'); }
-    public function download10kCert(Candidate $c)    { return $this->download($c, $c->race_10k_certificate, 'Sertifikat_10K'); }
-    public function download5kCert(Candidate $c)     { return $this->download($c, $c->race_5k_certificate,  'Sertifikat_5K'); }
-    public function downloadTrailCert(Candidate $c)  { return $this->download($c, $c->trail_certificate,    'Sertifikat_Trail'); }
-    public function downloadMileageDec(Candidate $c) { return $this->download($c, $c->mileage_dec_graph,    'Mileage_Des2025'); }
-    public function downloadMileageJan(Candidate $c) { return $this->download($c, $c->mileage_jan_graph,    'Mileage_Jan2026'); }
-    public function downloadMileageFeb(Candidate $c) { return $this->download($c, $c->mileage_feb_graph,    'Mileage_Feb2026'); }
-    public function downloadMileageMar(Candidate $c) { return $this->download($c, $c->mileage_mar_graph,    'Mileage_Mar2026'); }
-    public function downloadBtFm(Candidate $c)       { return $this->download($c, $c->best_time_fm_file,    'BestTime_FM'); }
-    public function downloadBtHm(Candidate $c)       { return $this->download($c, $c->best_time_hm_file,    'BestTime_HM'); }
-    public function downloadBt10k(Candidate $c)      { return $this->download($c, $c->best_time_10k_file,   'BestTime_10K'); }
-    public function downloadBt5k(Candidate $c)       { return $this->download($c, $c->best_time_5k_file,    'BestTime_5K'); }
-    public function downloadWaiver(Candidate $c)     { return $this->download($c, $c->waiver_file,          'Waiver'); }
+    // Ganti semua $c menjadi $candidate
+    public function previewKtp(Candidate $candidate)        { return $this->preview($candidate, $candidate->ktp_file); }
+    public function previewFmCert(Candidate $candidate)     { return $this->preview($candidate, $candidate->fm_certificate); }
+    public function previewHmCert(Candidate $candidate)     { return $this->preview($candidate, $candidate->hm_certificate); }
+    public function preview10kCert(Candidate $candidate)    { return $this->preview($candidate, $candidate->race_10k_certificate); }
+    public function preview5kCert(Candidate $candidate)     { return $this->preview($candidate, $candidate->race_5k_certificate); }
+    public function previewTrailCert(Candidate $candidate)  { return $this->preview($candidate, $candidate->trail_certificate); }
+    public function previewMileageDec(Candidate $candidate) { return $this->preview($candidate, $candidate->mileage_dec_graph); }
+    public function previewMileageJan(Candidate $candidate) { return $this->preview($candidate, $candidate->mileage_jan_graph); }
+    public function previewMileageFeb(Candidate $candidate) { return $this->preview($candidate, $candidate->mileage_feb_graph); }
+    public function previewMileageMar(Candidate $candidate) { return $this->preview($candidate, $candidate->mileage_mar_graph); }
+    public function previewBtFm(Candidate $candidate)       { return $this->preview($candidate, $candidate->best_time_fm_file); }
+    public function previewBtHm(Candidate $candidate)       { return $this->preview($candidate, $candidate->best_time_hm_file); }
+    public function previewBt10k(Candidate $candidate)      { return $this->preview($candidate, $candidate->best_time_10k_file); }
+    public function previewBt5k(Candidate $candidate)       { return $this->preview($candidate, $candidate->best_time_5k_file); }
+    public function previewWaiver(Candidate $candidate)     { return $this->preview($candidate, $candidate->waiver_file); }
 
     // ── EXPORT CSV ───────────────────────────────────────────
 

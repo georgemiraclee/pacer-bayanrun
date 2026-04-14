@@ -69,22 +69,22 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/',        [AdminController::class, 'show'])->name('show');
             Route::post('/status', [AdminController::class, 'updateStatus'])->name('status');
 
-            // Downloads - langsung download, tidak ada halaman preview
-            Route::get('/dl/ktp',         [AdminController::class, 'downloadKtp'])->name('download.ktp');
-            Route::get('/dl/fm-cert',     [AdminController::class, 'downloadFmCert'])->name('download.fm');
-            Route::get('/dl/hm-cert',     [AdminController::class, 'downloadHmCert'])->name('download.hm');
-            Route::get('/dl/10k-cert',    [AdminController::class, 'download10kCert'])->name('download.10k');
-            Route::get('/dl/5k-cert',     [AdminController::class, 'download5kCert'])->name('download.5k');
-            Route::get('/dl/trail-cert',  [AdminController::class, 'downloadTrailCert'])->name('download.trail');
-            Route::get('/dl/mileage-dec', [AdminController::class, 'downloadMileageDec'])->name('download.mileage.dec');
-            Route::get('/dl/mileage-jan', [AdminController::class, 'downloadMileageJan'])->name('download.mileage.jan');
-            Route::get('/dl/mileage-feb', [AdminController::class, 'downloadMileageFeb'])->name('download.mileage.feb');
-            Route::get('/dl/mileage-mar', [AdminController::class, 'downloadMileageMar'])->name('download.mileage.mar');
-            Route::get('/dl/bt-fm',       [AdminController::class, 'downloadBtFm'])->name('download.bt.fm');
-            Route::get('/dl/bt-hm',       [AdminController::class, 'downloadBtHm'])->name('download.bt.hm');
-            Route::get('/dl/bt-10k',      [AdminController::class, 'downloadBt10k'])->name('download.bt.10k');
-            Route::get('/dl/bt-5k',       [AdminController::class, 'downloadBt5k'])->name('download.bt.5k');
-            Route::get('/dl/waiver',      [AdminController::class, 'downloadWaiver'])->name('download.waiver');
+            // Preview inline (buka di browser tab baru)
+            Route::get('/preview/ktp',         [AdminController::class, 'previewKtp'])->name('preview.ktp');
+            Route::get('/preview/fm-cert',     [AdminController::class, 'previewFmCert'])->name('preview.fm');
+            Route::get('/preview/hm-cert',     [AdminController::class, 'previewHmCert'])->name('preview.hm');
+            Route::get('/preview/10k-cert',    [AdminController::class, 'preview10kCert'])->name('preview.10k');
+            Route::get('/preview/5k-cert',     [AdminController::class, 'preview5kCert'])->name('preview.5k');
+            Route::get('/preview/trail-cert',  [AdminController::class, 'previewTrailCert'])->name('preview.trail');
+            Route::get('/preview/mileage-dec', [AdminController::class, 'previewMileageDec'])->name('preview.mileage.dec');
+            Route::get('/preview/mileage-jan', [AdminController::class, 'previewMileageJan'])->name('preview.mileage.jan');
+            Route::get('/preview/mileage-feb', [AdminController::class, 'previewMileageFeb'])->name('preview.mileage.feb');
+            Route::get('/preview/mileage-mar', [AdminController::class, 'previewMileageMar'])->name('preview.mileage.mar');
+            Route::get('/preview/bt-fm',       [AdminController::class, 'previewBtFm'])->name('preview.bt.fm');
+            Route::get('/preview/bt-hm',       [AdminController::class, 'previewBtHm'])->name('preview.bt.hm');
+            Route::get('/preview/bt-10k',      [AdminController::class, 'previewBt10k'])->name('preview.bt.10k');
+            Route::get('/preview/bt-5k',       [AdminController::class, 'previewBt5k'])->name('preview.bt.5k');
+            Route::get('/preview/waiver',      [AdminController::class, 'previewWaiver'])->name('preview.waiver');
         });
     });
 });
