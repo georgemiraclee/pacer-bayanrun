@@ -734,7 +734,7 @@
                 <div class="field">
                     <label class="label">Apakah pernah ikut event lain selain Road Race? <span class="req">*</span></label>
                     <div style="display:flex; flex-direction:column; gap:8px;">
-                        @foreach(['trail'=>'Pernah (Trail Event / Non-Road Race)','none'=>'Tidak Pernah Event Apapun'] as $val=>$lbl)
+                        @foreach(['trail'=>'Pernah','none'=>'Tidak Pernah Event Apapun'] as $val=>$lbl)
                         <label class="radio-opt">
                             <input type="radio" name="trail_status" value="{{ $val }}" x-model="trailStatus" {{ old('trail_status')===$val?'checked':'' }}>
                             <div class="radio-pip"></div>
