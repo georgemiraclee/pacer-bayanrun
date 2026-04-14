@@ -80,7 +80,7 @@
     .badge-verified { background:#DCFCE7; color:#15803D; }
     .badge-rejected { background:#FFE4E7; color:#E8001E; }
 
-    /* ── Download button ── */
+    /* ── Preview button ── */
     .dl-btn {
         display: inline-flex; align-items: center; gap: 6px;
         background: #F5F5F5; color: #555;
@@ -90,6 +90,7 @@
         font-size: 9px; font-weight: 700;
         letter-spacing: .08em; text-transform: uppercase;
         text-decoration: none; transition: all .15s; margin-top: 6px;
+        cursor: pointer;
     }
     .dl-btn:hover { background: #E8001E; color: #fff; border-color: #E8001E; }
 
@@ -162,10 +163,178 @@
         margin: 2px;
     }
     .no-exp { font-size: 13px; color: #CCCCCC; font-style: italic; padding: 6px 0; }
+
+    /* ══ PREVIEW MODAL ══ */
+    #preview-modal {
+        display: none;
+        position: fixed; inset: 0; z-index: 9999;
+        background: rgba(0,0,0,.75);
+        backdrop-filter: blur(6px);
+        align-items: center; justify-content: center;
+        padding: 20px;
+        animation: fadeIn .15s ease;
+    }
+    #preview-modal.open { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal-box {
+        background: #fff;
+        border-radius: 16px;
+        overflow: hidden;
+        width: 100%; max-width: 860px;
+        max-height: 92vh;
+        display: flex; flex-direction: column;
+        box-shadow: 0 24px 80px rgba(0,0,0,.35);
+        animation: slideUp .18s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(14px); opacity:.6; } to { transform: translateY(0); opacity:1; } }
+
+    .modal-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 14px 20px;
+        border-bottom: 1px solid #F0F0F0;
+        background: #FAFAFA; flex-shrink: 0;
+    }
+    .modal-title {
+        font-family: 'Syne', sans-serif; font-size: 11px;
+        font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #555;
+    }
+    .modal-close {
+        width: 30px; height: 30px; border-radius: 8px;
+        border: 1px solid #E8E8E8; background: #fff;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; color: #888; transition: all .15s;
+    }
+    .modal-close:hover { background: #E8001E; color: #fff; border-color: #E8001E; }
+
+    .modal-body {
+        flex: 1; overflow: auto;
+        display: flex; align-items: center; justify-content: center;
+        background: #F8F8F8; min-height: 200px; position: relative;
+    }
+
+    /* Image preview */
+    #modal-img {
+        max-width: 100%; max-height: calc(92vh - 80px);
+        object-fit: contain; display: block;
+        border-radius: 0;
+    }
+
+    /* PDF preview */
+    #modal-iframe {
+        width: 100%; height: calc(92vh - 80px);
+        border: none; display: block;
+    }
+
+    /* Loading spinner */
+    .modal-spinner {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 12px;
+        background: #F8F8F8;
+    }
+    .spinner-ring {
+        width: 36px; height: 36px;
+        border: 3px solid #E8E8E8;
+        border-top-color: #E8001E;
+        border-radius: 50%;
+        animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner-text {
+        font-family: 'Syne', sans-serif; font-size: 10px;
+        font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #AAAAAA;
+    }
+
+    /* Modal footer with download option */
+    .modal-footer {
+        padding: 10px 20px;
+        border-top: 1px solid #F0F0F0;
+        background: #FAFAFA;
+        display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .modal-footer-label {
+        font-size: 11px; color: #AAAAAA;
+    }
+    .modal-dl-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: #111; color: #fff;
+        border: none; padding: 7px 14px; border-radius: 8px;
+        font-family: 'Syne', sans-serif; font-size: 9px; font-weight: 700;
+        letter-spacing: .08em; text-transform: uppercase;
+        text-decoration: none; cursor: pointer; transition: background .15s;
+    }
+    .modal-dl-btn:hover { background: #E8001E; }
+
+    /* thumbnail preview in inline panels */
+    .thumb-wrap {
+        margin-top: 8px;
+        border: 1px solid #EBEBEB; border-radius: 10px;
+        overflow: hidden; cursor: pointer;
+        position: relative; max-width: 180px;
+        transition: box-shadow .15s;
+    }
+    .thumb-wrap:hover { box-shadow: 0 4px 18px rgba(232,0,30,.18); }
+    .thumb-wrap img { width: 100%; height: 100px; object-fit: cover; display: block; }
+    .thumb-wrap .thumb-overlay {
+        position: absolute; inset: 0;
+        background: rgba(0,0,0,0); transition: background .15s;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .thumb-wrap:hover .thumb-overlay { background: rgba(0,0,0,.45); }
+    .thumb-overlay span {
+        color: #fff; font-family:'Syne',sans-serif; font-size:9px; font-weight:700;
+        letter-spacing:.1em; text-transform:uppercase; opacity:0; transition: opacity .15s;
+    }
+    .thumb-wrap:hover .thumb-overlay span { opacity:1; }
+
+    .pdf-thumb {
+        background: #FAFAFA;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        height: 80px; gap: 6px; cursor: pointer;
+        border: 1px solid #EBEBEB; border-radius: 10px;
+        max-width: 180px; margin-top: 8px; transition: all .15s;
+    }
+    .pdf-thumb:hover { background: #FFE4E7; border-color: #E8001E; }
+    .pdf-thumb svg { color: #E8001E; }
+    .pdf-thumb span {
+        font-family:'Syne',sans-serif; font-size:9px; font-weight:700;
+        letter-spacing:.08em; text-transform:uppercase; color:#888;
+    }
 </style>
 @endpush
 
 @section('content')
+
+{{-- ══ PREVIEW MODAL ══ --}}
+<div id="preview-modal" role="dialog" aria-modal="true">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span class="modal-title" id="modal-title">Preview Dokumen</span>
+            <button class="modal-close" onclick="closePreview()" aria-label="Tutup">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <div class="modal-spinner" id="modal-spinner">
+                <div class="spinner-ring"></div>
+                <span class="spinner-text">Memuat dokumen…</span>
+            </div>
+            {{-- diisi JS --}}
+        </div>
+        <div class="modal-footer">
+            <span class="modal-footer-label" id="modal-file-label">—</span>
+            <a href="#" id="modal-dl-link" class="modal-dl-btn" download target="_blank">
+                <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Download
+            </a>
+        </div>
+    </div>
+</div>
 
 <a href="{{ route('admin.dashboard') }}" class="back-link">
     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,6 +384,19 @@
                 <span class="ik">Strava</span>
                 <span class="iv"><a href="{{ $candidate->strava }}" target="_blank">{{ $candidate->strava }}</a></span>
             </div>
+            {{-- KTP inline --}}
+            @if($candidate->ktp_file)
+            <div class="ir">
+                <span class="ik">KTP</span>
+                <span class="iv">
+                    <div class="thumb-wrap"
+                         onclick="openPreview('{{ route('admin.candidate.preview.ktp', $candidate) }}', 'KTP – {{ $candidate->nama }}', 'image')">
+                        <img src="{{ route('admin.candidate.preview.ktp', $candidate) }}" alt="KTP">
+                        <div class="thumb-overlay"><span>Perbesar</span></div>
+                    </div>
+                </span>
+            </div>
+            @endif
         </div>
     </div>
 
@@ -234,7 +416,10 @@
                     @if($candidate->is_full_marathon)
                         <strong>{{ $candidate->fm_event }}</strong> ({{ $candidate->fm_year }})
                         @if($candidate->fm_certificate)
-                        <br><a href="{{ route('admin.candidate.download.fm', $candidate) }}" class="dl-btn">↓ Sertifikat FM</a>
+                        <br>
+                        <button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.fm', $candidate) }}', 'Sertifikat FM', 'image')">
+                            ↗ Sertifikat FM
+                        </button>
                         @endif
                     @else<span class="iv-empty">Tidak Pernah</span>@endif
                 </span>
@@ -246,7 +431,10 @@
                     @if($candidate->is_half_marathon)
                         <strong>{{ $candidate->hm_event }}</strong> ({{ $candidate->hm_year }})
                         @if($candidate->hm_certificate)
-                        <br><a href="{{ route('admin.candidate.download.hm', $candidate) }}" class="dl-btn">↓ Sertifikat HM</a>
+                        <br>
+                        <button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.hm', $candidate) }}', 'Sertifikat HM', 'image')">
+                            ↗ Sertifikat HM
+                        </button>
                         @endif
                     @else<span class="iv-empty">Tidak Pernah</span>@endif
                 </span>
@@ -258,7 +446,10 @@
                     @if($candidate->is_10k === 'pernah')
                         <strong>{{ $candidate->race_10k_event }}</strong> ({{ $candidate->race_10k_year }})
                         @if($candidate->race_10k_certificate)
-                        <br><a href="{{ route('admin.candidate.download.10k', $candidate) }}" class="dl-btn">↓ Sertifikat 10K</a>
+                        <br>
+                        <button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.10k', $candidate) }}', 'Sertifikat 10K', 'image')">
+                            ↗ Sertifikat 10K
+                        </button>
                         @endif
                     @elseif($candidate->is_10k === 'skip')<span class="iv-empty">Dilewati</span>
                     @else<span class="iv-empty">Tidak Pernah</span>@endif
@@ -271,7 +462,10 @@
                     @if($candidate->is_5k === 'pernah')
                         <strong>{{ $candidate->race_5k_event }}</strong> ({{ $candidate->race_5k_year }})
                         @if($candidate->race_5k_certificate)
-                        <br><a href="{{ route('admin.candidate.download.5k', $candidate) }}" class="dl-btn">↓ Sertifikat 5K</a>
+                        <br>
+                        <button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.5k', $candidate) }}', 'Sertifikat 5K', 'image')">
+                            ↗ Sertifikat 5K
+                        </button>
                         @endif
                     @elseif($candidate->is_5k === 'skip')<span class="iv-empty">Dilewati</span>
                     @else<span class="iv-empty">Tidak Pernah</span>@endif
@@ -284,7 +478,10 @@
                 <span class="iv">
                     <strong>{{ $candidate->trail_event }}</strong> ({{ $candidate->trail_year }})
                     @if($candidate->trail_certificate)
-                    <br><a href="{{ route('admin.candidate.download.trail', $candidate) }}" class="dl-btn">↓ Sertifikat Trail</a>
+                    <br>
+                    <button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.trail', $candidate) }}', 'Sertifikat Trail', 'image')">
+                        ↗ Sertifikat Trail
+                    </button>
                     @endif
                 </span>
             </div>
@@ -303,11 +500,11 @@
         <div class="panel-body">
             <div class="mileage-grid">
                 @foreach([
-                    ['Des 2025', $candidate->mileage_dec_2025, $candidate->mileage_dec_graph, 'download.mileage.dec'],
-                    ['Jan 2026', $candidate->mileage_jan_2026, $candidate->mileage_jan_graph, 'download.mileage.jan'],
-                    ['Feb 2026', $candidate->mileage_feb_2026, $candidate->mileage_feb_graph, 'download.mileage.feb'],
-                    ['Mar 2026', $candidate->mileage_mar_2026, $candidate->mileage_mar_graph, 'download.mileage.mar'],
-                ] as [$period, $km, $graph, $route])
+                    ['Des 2025', $candidate->mileage_dec_2025, $candidate->mileage_dec_graph, 'preview.mileage.dec', 'Grafik Mileage Des 2025'],
+                    ['Jan 2026', $candidate->mileage_jan_2026, $candidate->mileage_jan_graph, 'preview.mileage.jan', 'Grafik Mileage Jan 2026'],
+                    ['Feb 2026', $candidate->mileage_feb_2026, $candidate->mileage_feb_graph, 'preview.mileage.feb', 'Grafik Mileage Feb 2026'],
+                    ['Mar 2026', $candidate->mileage_mar_2026, $candidate->mileage_mar_graph, 'preview.mileage.mar', 'Grafik Mileage Mar 2026'],
+                ] as [$period, $km, $graph, $route, $label])
                 <div class="m-card">
                     <div class="period">{{ $period }}</div>
                     <div>
@@ -315,7 +512,10 @@
                         <span class="km-unit">km</span>
                     </div>
                     @if($graph)
-                    <a href="{{ route('admin.candidate.'.$route, $candidate) }}" class="dl-btn">↓ Grafik</a>
+                    <button class="dl-btn" style="margin-top:8px;"
+                            onclick="openPreview('{{ route('admin.candidate.'.$route, $candidate) }}', '{{ $label }}', 'image')">
+                        ↗ Grafik
+                    </button>
                     @endif
                 </div>
                 @endforeach
@@ -328,18 +528,21 @@
         <div class="panel-head"><span class="panel-head-label">Catatan Waktu Terbaik</span></div>
         <div class="panel-body" style="padding-top:6px; padding-bottom:6px;">
             @foreach([
-                ['FM (42K)', $candidate->best_time_fm,  $candidate->best_time_fm_file,  'download.bt.fm'],
-                ['HM (21K)', $candidate->best_time_hm,  $candidate->best_time_hm_file,  'download.bt.hm'],
-                ['10K',      $candidate->best_time_10k, $candidate->best_time_10k_file, 'download.bt.10k'],
-                ['5K',       $candidate->best_time_5k,  $candidate->best_time_5k_file,  'download.bt.5k'],
-            ] as [$label, $time, $file, $route])
+                ['FM (42K)', $candidate->best_time_fm,  $candidate->best_time_fm_file,  'preview.bt.fm',  'Bukti Best Time FM'],
+                ['HM (21K)', $candidate->best_time_hm,  $candidate->best_time_hm_file,  'preview.bt.hm',  'Bukti Best Time HM'],
+                ['10K',      $candidate->best_time_10k, $candidate->best_time_10k_file, 'preview.bt.10k', 'Bukti Best Time 10K'],
+                ['5K',       $candidate->best_time_5k,  $candidate->best_time_5k_file,  'preview.bt.5k',  'Bukti Best Time 5K'],
+            ] as [$label, $time, $file, $route, $title])
             <div class="ir">
                 <span class="ik">{{ $label }}</span>
                 <span class="iv">
                     @if($time)
                         <strong style="color:#E8001E; font-size:15px; font-family:'Syne',sans-serif;">{{ $time }}</strong>
                         @if($file)
-                        <a href="{{ route('admin.candidate.'.$route, $candidate) }}" class="dl-btn" style="margin-left:6px;">↓ Bukti</a>
+                        <button class="dl-btn" style="margin-left:6px; vertical-align:middle;"
+                                onclick="openPreview('{{ route('admin.candidate.'.$route, $candidate) }}', '{{ $title }}', 'image')">
+                            ↗ Bukti
+                        </button>
                         @endif
                     @else<span class="iv-empty">—</span>@endif
                 </span>
@@ -412,46 +615,63 @@
     </div>
     <div class="panel-body" style="display:flex; flex-direction:column; gap:8px;">
 
-        {{-- KTP --}}
         @if($candidate->ktp_file)
-        <a href="{{ route('admin.candidate.download.ktp', $candidate) }}" class="dl-btn" style="justify-content:center; margin-top:0;" target="_blank">
+        <button class="dl-btn" style="justify-content:center; margin-top:0;"
+                onclick="openPreview('{{ route('admin.candidate.preview.ktp', $candidate) }}', 'KTP – {{ $candidate->nama }}', 'image')">
             <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
             </svg>
             Lihat KTP
-        </a>
+        </button>
         @endif
 
         @if($candidate->waiver_file)
-        <a href="{{ route('admin.candidate.download.waiver', $candidate) }}" class="dl-btn" style="justify-content:center; margin-top:0;" target="_blank">
+        <button class="dl-btn" style="justify-content:center; margin-top:0;"
+                onclick="openPreview('{{ route('admin.candidate.preview.waiver', $candidate) }}', 'Waiver – {{ $candidate->nama }}', 'pdf')">
             <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
             </svg>
             Lihat Waiver
-        </a>
+        </button>
         @endif
 
         @if($candidate->fm_certificate)
-        <a href="{{ route('admin.candidate.download.fm', $candidate) }}" class="dl-btn" style="justify-content:center; margin-top:0;" target="_blank">↗ Sertifikat FM</a>
+        <button class="dl-btn" style="justify-content:center; margin-top:0;"
+                onclick="openPreview('{{ route('admin.candidate.preview.fm', $candidate) }}', 'Sertifikat FM', 'image')">
+            ↗ Sertifikat FM
+        </button>
         @endif
 
         @if($candidate->hm_certificate)
-        <a href="{{ route('admin.candidate.download.hm', $candidate) }}" class="dl-btn" style="justify-content:center; margin-top:0;" target="_blank">↗ Sertifikat HM</a>
+        <button class="dl-btn" style="justify-content:center; margin-top:0;"
+                onclick="openPreview('{{ route('admin.candidate.preview.hm', $candidate) }}', 'Sertifikat HM', 'image')">
+            ↗ Sertifikat HM
+        </button>
         @endif
 
         @if($candidate->race_10k_certificate)
-        <a href="{{ route('admin.candidate.download.10k', $candidate) }}" class="dl-btn" style="justify-content:center; margin-top:0;" target="_blank">↗ Sertifikat 10K</a>
+        <button class="dl-btn" style="justify-content:center; margin-top:0;"
+                onclick="openPreview('{{ route('admin.candidate.preview.10k', $candidate) }}', 'Sertifikat 10K', 'image')">
+            ↗ Sertifikat 10K
+        </button>
         @endif
 
         @if($candidate->race_5k_certificate)
-        <a href="{{ route('admin.candidate.download.5k', $candidate) }}" class="dl-btn" style="justify-content:center; margin-top:0;" target="_blank">↗ Sertifikat 5K</a>
+        <button class="dl-btn" style="justify-content:center; margin-top:0;"
+                onclick="openPreview('{{ route('admin.candidate.preview.5k', $candidate) }}', 'Sertifikat 5K', 'image')">
+            ↗ Sertifikat 5K
+        </button>
         @endif
 
         @if($candidate->trail_certificate)
-        <a href="{{ route('admin.candidate.download.trail', $candidate) }}" class="dl-btn" style="justify-content:center; margin-top:0;" target="_blank">↗ Sertifikat Trail</a>
+        <button class="dl-btn" style="justify-content:center; margin-top:0;"
+                onclick="openPreview('{{ route('admin.candidate.preview.trail', $candidate) }}', 'Sertifikat Trail', 'image')">
+            ↗ Sertifikat Trail
+        </button>
         @endif
-            </div>
-        </div>
+
+    </div>
+</div>
 
     {{-- Pernyataan Keabsahan --}}
     <div class="panel">
@@ -561,5 +781,61 @@
 
 </div>
 </div>
+
+@push('admin-scripts')
+<script>
+function openPreview(url, title, type) {
+    const modal   = document.getElementById('preview-modal');
+    const body    = document.getElementById('modal-body');
+    const spinner = document.getElementById('modal-spinner');
+    const titleEl = document.getElementById('modal-title');
+    const label   = document.getElementById('modal-file-label');
+    const dlLink  = document.getElementById('modal-dl-link');
+
+    // Reset
+    titleEl.textContent = title;
+    label.textContent   = title;
+    dlLink.href         = url;
+    body.querySelectorAll('img, iframe').forEach(el => el.remove());
+    spinner.style.display = 'flex';
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    if (type === 'pdf') {
+        const iframe = document.createElement('iframe');
+        iframe.id  = 'modal-iframe';
+        iframe.src = url;
+        iframe.onload = () => { spinner.style.display = 'none'; };
+        body.appendChild(iframe);
+    } else {
+        const img = document.createElement('img');
+        img.id  = 'modal-img';
+        img.src = url;
+        img.alt = title;
+        img.onload  = () => { spinner.style.display = 'none'; };
+        img.onerror = () => {
+            spinner.innerHTML = '<span style="font-family:\'Syne\',sans-serif;font-size:11px;color:#E8001E;font-weight:700;">Gagal memuat file</span>';
+        };
+        body.appendChild(img);
+    }
+}
+
+function closePreview() {
+    const modal = document.getElementById('preview-modal');
+    const body  = document.getElementById('modal-body');
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+    body.querySelectorAll('img, iframe').forEach(el => el.remove());
+}
+
+// Tutup dengan klik backdrop atau Escape
+document.getElementById('preview-modal').addEventListener('click', function(e) {
+    if (e.target === this) closePreview();
+});
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closePreview();
+});
+</script>
+@endpush
 
 @endsection

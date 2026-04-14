@@ -520,11 +520,28 @@
                     </div>
                 </div>
 
+                {{-- Input Domisili yang telah diubah menjadi Radio Button --}}
                 <div class="field">
-                    <label class="label">Domisili <span class="req">*</span><span class="hint">(kota/kabupaten)</span></label>
-                    <select name="domisili" id="fieldDomisili" class="{{ $errors->has('domisili')?'err':'' }}" style="width:100%; padding:10px; border-radius:var(--radius-input); border:1.5px solid #DDD;">
-                        <option value="">Pilih Kota/Kabupaten</option>
-                    </select>
+                    <label class="label">Apakah anda berdomisili di Balikpapan? <span class="req">*</span></label>
+                    <div class="radio-group">
+                        {{-- Pilihan Ya --}}
+                        <label class="dist-card" :class="domisili === 'Balikpapan' ? 'selected' : ''" @click="domisili = 'Balikpapan'">
+                            <input type="radio" name="domisili" value="Balikpapan" x-model="domisili" style="display:none">
+                            <div class="dist-check">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4"><path d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <span class="dist-label">Ya</span>
+                        </label>
+
+                        {{-- Pilihan Tidak --}}
+                        <label class="dist-card" :class="domisili === 'Luar Balikpapan' ? 'selected' : ''" @click="domisili = 'Luar Balikpapan'">
+                            <input type="radio" name="domisili" value="Luar Balikpapan" x-model="domisili" style="display:none">
+                            <div class="dist-check">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4"><path d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <span class="dist-label">Tidak</span>
+                        </label>
+                    </div>
                     @error('domisili')<span class="err-msg">{{ $message }}</span>@enderror
                 </div>
 
@@ -646,13 +663,12 @@
         </div>
 
 {{-- ════ SECTION 4 — 10K & 5K (Hanya muncul jika FM & HM 'tidak') ════ --}}
-<div class="card" x-show="fm === 'tidak' && hm === 'tidak'" x-transition>
+<div class="card" x-transition>
     <div class="card-head">
         <div class="card-num">4</div>
         <div class="card-title">Pengalaman 10K & 5K</div>
     </div>
     <div class="card-body">
-        <div class="info-box">💡 Wajib diisi karena Anda belum pernah FM maupun HM.</div>
 
         {{-- Kategori 10K --}}
         <div style="border-bottom:1px solid #F0F0F0; padding-bottom:20px; margin-bottom:20px;">
@@ -1489,6 +1505,7 @@ function regForm(){
         hm:'{{ old('is_half_marathon','') }}',
         r10k:'{{ old('is_10k','') }}',
         r5k:'{{ old('is_5k','') }}',
+        domisili: '{{ old('domisili', '') }}', // Tambahkan atau pastikan baris ini ada
         trailStatus:'{{ old('trail_status','') }}',
         pacerExp:'{{ old('is_pacer_experience','') }}',
         komitmen:'{{ old('komitmen','') }}',
