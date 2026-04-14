@@ -8,233 +8,168 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
-    // ────────────────────────────────────────────────────────
-    // AUTH
-    // ────────────────────────────────────────────────────────
+    // ── AUTH ──────────────────────────────────────────────────
 
-    /**
-     * Tampilkan halaman login admin
-     */
     public function loginForm()
     {
-        if (Auth::guard('admin')->check()) {
-            return redirect()->route('admin.dashboard');
-        }
-
+        if (Auth::guard('admin')->check()) return redirect()->route('admin.dashboard');
         return view('admin.login');
     }
 
-    /**
-     * Proses login admin
-     */
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email'    => ['required', 'email'],
+        $creds = $request->validate([
+            'email'    => ['required','email'],
             'password' => ['required'],
         ]);
-
-        if (Auth::guard('admin')->attempt($credentials, $request->boolean('remember'))) {
+        if (Auth::guard('admin')->attempt($creds, $request->boolean('remember'))) {
             $request->session()->regenerate();
             return redirect()->intended(route('admin.dashboard'));
         }
-
-        return back()->withErrors([
-            'email' => 'Email atau password salah.',
-        ])->onlyInput('email');
+        return back()->withErrors(['email' => 'Email atau password salah.'])->onlyInput('email');
     }
 
-    /**
-     * Logout admin
-     */
     public function logout(Request $request)
     {
         Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect()->route('admin.login');
     }
 
-    // ────────────────────────────────────────────────────────
-    // DASHBOARD
-    // ────────────────────────────────────────────────────────
+    // ── DASHBOARD ────────────────────────────────────────────
 
-    /**
-     * Dashboard utama - list semua kandidat dengan filter
-     */
     public function dashboard(Request $request)
     {
         $query = Candidate::query()->latest();
 
-        // Filter status
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // Filter domisili
-        if ($request->filled('domisili')) {
-            $query->where('domisili', 'like', '%' . $request->domisili . '%');
-        }
-
-        // Filter pengalaman race
+        if ($request->filled('status'))   $query->where('status', $request->status);
+        if ($request->filled('domisili')) $query->where('domisili', 'like', '%'.$request->domisili.'%');
         if ($request->filled('race')) {
-            match ($request->race) {
+            match($request->race) {
                 'fm'   => $query->where('is_full_marathon', true),
                 'hm'   => $query->where('is_half_marathon', true),
+                '10k'  => $query->where('is_10k', 'pernah'),
+                '5k'   => $query->where('is_5k', 'pernah'),
                 'none' => $query->where('is_full_marathon', false)->where('is_half_marathon', false),
                 default => null,
             };
         }
-
-        // Search by nama/email
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
+            $s = $request->search;
+            $query->where(fn($q) => $q->where('nama','like',"%{$s}%")->orWhere('email','like',"%{$s}%"));
         }
 
         $candidates = $query->paginate(15)->withQueryString();
-
-        // Statistik ringkasan
         $stats = [
             'total'    => Candidate::count(),
-            'pending'  => Candidate::where('status', 'pending')->count(),
-            'verified' => Candidate::where('status', 'verified')->count(),
-            'rejected' => Candidate::where('status', 'rejected')->count(),
+            'pending'  => Candidate::where('status','pending')->count(),
+            'verified' => Candidate::where('status','verified')->count(),
+            'rejected' => Candidate::where('status','rejected')->count(),
         ];
 
-        return view('admin.dashboard', compact('candidates', 'stats'));
+        return view('admin.dashboard', compact('candidates','stats'));
     }
 
-    /**
-     * Detail kandidat
-     */
     public function show(Candidate $candidate)
     {
         return view('admin.detail', compact('candidate'));
     }
 
-    /**
-     * Update status kandidat (approve/reject)
-     */
     public function updateStatus(Request $request, Candidate $candidate)
     {
         $request->validate([
-            'status'        => ['required', 'in:verified,rejected'],
-            'catatan_admin' => ['nullable', 'string', 'max:1000'],
+            'status'        => ['required','in:verified,rejected,pending'],
+            'catatan_admin' => ['nullable','string','max:1000'],
         ]);
-
-        $candidate->update([
-            'status'        => $request->status,
-            'catatan_admin' => $request->catatan_admin,
-        ]);
-
-        $label = $request->status === 'verified' ? 'Diverifikasi' : 'Ditolak';
-
+        $candidate->update(['status' => $request->status, 'catatan_admin' => $request->catatan_admin]);
+        $label = match($request->status) {
+            'verified' => 'Diterima', 'rejected' => 'Ditolak', default => 'Di-reset ke Pending'
+        };
         return back()->with('success', "Kandidat {$candidate->nama} berhasil {$label}.");
     }
 
-    /**
-     * Download file KTP (hanya admin)
-     */
-    public function downloadKtp(Candidate $candidate)
-    {
-        abort_unless(
-            Storage::disk('private')->exists($candidate->ktp_file),
-            404,
-            'File KTP tidak ditemukan.'
-        );
+        private function download(Candidate $candidate, ?string $storedPath, string $prefix)
+        {
+            if (!$storedPath) abort(404);
 
-        return Storage::disk('private')->download(
-            $candidate->ktp_file,
-            'KTP_' . $candidate->nama . '_' . $candidate->id . '.jpg'
-        );
+            $absolutePath = storage_path('app/private/' . $storedPath);
+
+            if (!file_exists($absolutePath)) abort(404);
+
+            $ext = pathinfo($storedPath, PATHINFO_EXTENSION);
+            $safeName = Str::slug($candidate->nama);
+            $filename = "{$prefix}_{$safeName}.{$ext}";
+
+            return response()->download($absolutePath, $filename);
+        }
+
+    private function getMimeType(string $ext): string
+    {
+        return match(strtolower($ext)) {
+            'pdf'  => 'application/pdf',
+            'jpg', 'jpeg' => 'image/jpeg',
+            'png'  => 'image/png',
+            default => 'application/octet-stream',
+        };
     }
 
-    /**
-     * Download sertifikat FM
-     */
-    public function downloadFmCert(Candidate $candidate)
-    {
-        abort_unless(
-            $candidate->fm_certificate &&
-            Storage::disk('private')->exists($candidate->fm_certificate),
-            404,
-            'File sertifikat tidak ditemukan.'
-        );
+    public function downloadKtp(Candidate $c)        { return $this->download($c, $c->ktp_file,            'KTP'); }
+    public function downloadFmCert(Candidate $c)     { return $this->download($c, $c->fm_certificate,      'Sertifikat_FM'); }
+    public function downloadHmCert(Candidate $c)     { return $this->download($c, $c->hm_certificate,      'Sertifikat_HM'); }
+    public function download10kCert(Candidate $c)    { return $this->download($c, $c->race_10k_certificate, 'Sertifikat_10K'); }
+    public function download5kCert(Candidate $c)     { return $this->download($c, $c->race_5k_certificate,  'Sertifikat_5K'); }
+    public function downloadTrailCert(Candidate $c)  { return $this->download($c, $c->trail_certificate,    'Sertifikat_Trail'); }
+    public function downloadMileageDec(Candidate $c) { return $this->download($c, $c->mileage_dec_graph,    'Mileage_Des2025'); }
+    public function downloadMileageJan(Candidate $c) { return $this->download($c, $c->mileage_jan_graph,    'Mileage_Jan2026'); }
+    public function downloadMileageFeb(Candidate $c) { return $this->download($c, $c->mileage_feb_graph,    'Mileage_Feb2026'); }
+    public function downloadMileageMar(Candidate $c) { return $this->download($c, $c->mileage_mar_graph,    'Mileage_Mar2026'); }
+    public function downloadBtFm(Candidate $c)       { return $this->download($c, $c->best_time_fm_file,    'BestTime_FM'); }
+    public function downloadBtHm(Candidate $c)       { return $this->download($c, $c->best_time_hm_file,    'BestTime_HM'); }
+    public function downloadBt10k(Candidate $c)      { return $this->download($c, $c->best_time_10k_file,   'BestTime_10K'); }
+    public function downloadBt5k(Candidate $c)       { return $this->download($c, $c->best_time_5k_file,    'BestTime_5K'); }
+    public function downloadWaiver(Candidate $c)     { return $this->download($c, $c->waiver_file,          'Waiver'); }
 
-        return Storage::disk('private')->download(
-            $candidate->fm_certificate,
-            'FM_Certificate_' . $candidate->nama . '.jpg'
-        );
-    }
+    // ── EXPORT CSV ───────────────────────────────────────────
 
-    /**
-     * Download sertifikat HM
-     */
-    public function downloadHmCert(Candidate $candidate)
-    {
-        abort_unless(
-            $candidate->hm_certificate &&
-            Storage::disk('private')->exists($candidate->hm_certificate),
-            404,
-            'File sertifikat tidak ditemukan.'
-        );
-
-        return Storage::disk('private')->download(
-            $candidate->hm_certificate,
-            'HM_Certificate_' . $candidate->nama . '.jpg'
-        );
-    }
-
-    /**
-     * Export kandidat ke CSV
-     */
     public function exportCsv(Request $request)
     {
         $candidates = Candidate::query()
             ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
             ->get();
 
-        $filename = 'candidates_bayan_run_' . now()->format('Ymd_His') . '.csv';
-        $headers  = [
-            'Content-Type'        => 'text/csv',
-            'Content-Disposition' => "attachment; filename={$filename}",
-        ];
+        $fn      = 'candidates_bayanrun_'.now()->format('Ymd_His').'.csv';
+        $headers = ['Content-Type'=>'text/csv','Content-Disposition'=>"attachment; filename={$fn}"];
 
-        $callback = function () use ($candidates) {
-            $file = fopen('php://output', 'w');
-
-            // Header CSV
-            fputcsv($file, [
-                'ID', 'Nama', 'Email', 'Tanggal Lahir', 'Domisili',
-                'Instagram', 'Strava', 'Full Marathon', 'Half Marathon',
-                'Status', 'Tanggal Daftar',
-            ]);
-
+        $callback = function() use ($candidates) {
+            $f = fopen('php://output','w');
+            fputcsv($f, ['ID','NIK','Nama','Email','Tgl Lahir','Domisili','Instagram','Strava',
+                'FM','HM','10K','5K','Mileage Total (km)',
+                'Best FM','Best HM','Best 10K','Best 5K',
+                'Pacer Exp','Komitmen','Izin Keluarga','Status','Daftar']);
             foreach ($candidates as $c) {
-                fputcsv($file, [
-                    $c->id,
-                    $c->nama,
-                    $c->email,
-                    $c->tanggal_lahir->format('d/m/Y'),
-                    $c->domisili,
-                    $c->instagram,
-                    $c->strava,
+                fputcsv($f, [
+                    $c->id, $c->nik ?? '', $c->nama, $c->email,
+                    $c->tanggal_lahir ?? '', $c->domisili,
+                    $c->instagram, $c->strava,
                     $c->is_full_marathon ? 'Ya' : 'Tidak',
                     $c->is_half_marathon ? 'Ya' : 'Tidak',
+                    $c->is_10k, $c->is_5k,
+                    number_format($c->totalMileage(), 2),
+                    $c->best_time_fm  ?? '-', $c->best_time_hm  ?? '-',
+                    $c->best_time_10k ?? '-', $c->best_time_5k  ?? '-',
+                    $c->is_pacer_experience ? 'Ya' : 'Tidak',
+                    $c->komitmen      ?? '-',
+                    $c->izin_keluarga ?? '-',
                     $c->status->label(),
                     $c->created_at->format('d/m/Y H:i'),
                 ]);
             }
-
-            fclose($file);
+            fclose($f);
         };
 
         return response()->stream($callback, 200, $headers);

@@ -281,11 +281,11 @@
 
         /* ── Footer ── */
         .site-footer {
-            background:var(--dark); text-align:center;
+            background:var(--white); text-align:center;
             padding:36px 24px;
             font-size:12px; color:#444;
         }
-        .site-footer img { height:30px; opacity:.4; margin-bottom:12px; display:block; margin-inline:auto; }
+        .site-footer img { height:50px; margin-bottom:12px; display:block; margin-inline:auto; }
     </style>
 
     @stack('styles')
