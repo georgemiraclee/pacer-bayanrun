@@ -2,11 +2,48 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CandidateController;
+use App\Http\Controllers\KtpOcrController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Middleware\AdminAuthenticate;
 
 // ── Public ──────────────────────────────────────────────────
 Route::get('/', fn() => redirect()->route('candidate.register'));
+
+// ── OCR KTP (AJAX endpoint) ──────────────────────────────────
+Route::post('/ocr/ktp', [KtpOcrController::class, 'scan'])->name('ocr.ktp');
+
+// ── DIAGNOSTIC: cek storage (hapus setelah production) ───────
+Route::get('/admin/debug-storage/{id}', function($id) {
+    if (!app()->isLocal()) abort(403);
+    $c = \App\Models\Candidate::findOrFail($id);
+    $checks = [];
+    $fields = [
+        'ktp_file', 'fm_certificate', 'hm_certificate',
+        'race_10k_certificate', 'race_5k_certificate', 'trail_certificate',
+        'mileage_dec_graph', 'mileage_jan_graph', 'mileage_feb_graph', 'mileage_mar_graph',
+        'best_time_fm_file', 'best_time_hm_file', 'best_time_10k_file', 'best_time_5k_file',
+        'waiver_file',
+    ];
+    foreach ($fields as $f) {
+        $path = $c->$f;
+        if (!$path) { $checks[$f] = 'NULL (tidak ada)'; continue; }
+        $diskExists = \Illuminate\Support\Facades\Storage::disk('private')->exists($path);
+        $absPath    = storage_path('app/private/' . $path);
+        $fileExists = file_exists($absPath);
+        $checks[$f] = [
+            'db_path'     => $path,
+            'disk_exists' => $diskExists ? 'YA ✓' : 'TIDAK ✗',
+            'file_exists' => $fileExists ? 'YA ✓' : 'TIDAK ✗',
+            'abs_path'    => $absPath,
+            'size'        => $fileExists ? round(filesize($absPath)/1024,1).'KB' : '—',
+        ];
+    }
+    return response()->json([
+        'kandidat'     => $c->nama,
+        'storage_root' => storage_path('app/private'),
+        'checks'       => $checks,
+    ], 200, ['Content-Type'=>'application/json'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+})->middleware(\App\Http\Middleware\AdminAuthenticate::class);
 
 Route::prefix('daftar')->name('candidate.')->group(function () {
     Route::get('/',       [CandidateController::class, 'create'])->name('register');
@@ -25,10 +62,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/export',    [AdminController::class, 'exportCsv'])->name('export');
 
         Route::prefix('kandidat/{candidate}')->name('candidate.')->group(function () {
-            Route::get('/',            [AdminController::class, 'show'])->name('show');
-            Route::post('/status',     [AdminController::class, 'updateStatus'])->name('status');
+            Route::get('/',        [AdminController::class, 'show'])->name('show');
+            Route::post('/status', [AdminController::class, 'updateStatus'])->name('status');
 
-            // Downloads
+            // Downloads - langsung download, tidak ada halaman preview
             Route::get('/dl/ktp',         [AdminController::class, 'downloadKtp'])->name('download.ktp');
             Route::get('/dl/fm-cert',     [AdminController::class, 'downloadFmCert'])->name('download.fm');
             Route::get('/dl/hm-cert',     [AdminController::class, 'downloadHmCert'])->name('download.hm');

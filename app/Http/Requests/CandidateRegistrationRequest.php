@@ -13,8 +13,9 @@ class CandidateRegistrationRequest extends FormRequest
         $rules = [
             // ── Section 1: Data Pribadi ─────────────────────────────
             'email'         => ['required','email:rfc,dns','unique:candidates,email','max:255'],
+            'nik'           => ['nullable','string','digits:16'],
             'nama'          => ['required','string','min:3','max:255'],
-            'tanggal_lahir' => ['required','date','before:today'],
+            'tanggal_lahir' => ['required','string','max:20'], // format DD-MM-YYYY dari OCR
             'domisili'      => ['required','string','max:255'],
             'alamat'        => ['required','string','min:10','max:1000'],
             'ktp_file'      => ['required','file','mimes:pdf,jpg,jpeg,png','max:10240'],
@@ -34,14 +35,18 @@ class CandidateRegistrationRequest extends FormRequest
             'is_5k' => ['required','in:pernah,tidak,skip'],
 
             // ── Section 7: Mileage (semua wajib) ───────────────────
-            'mileage_dec_2025'  => ['required','numeric','min:0','max:9999'],
-            'mileage_dec_graph' => ['required','file','mimes:jpg,jpeg,png','max:10240'],
-            'mileage_jan_2026'  => ['required','numeric','min:0','max:9999'],
-            'mileage_jan_graph' => ['required','file','mimes:jpg,jpeg,png','max:10240'],
-            'mileage_feb_2026'  => ['required','numeric','min:0','max:9999'],
-            'mileage_feb_graph' => ['required','file','mimes:jpg,jpeg,png','max:10240'],
-            'mileage_mar_2026'  => ['required','numeric','min:0','max:9999'],
-            'mileage_mar_graph' => ['required','file','mimes:jpg,jpeg,png','max:10240'],
+            // Section 7: Mileage
+            'mileage_dec_2025'  => ['required', 'numeric', 'min:0'],
+            'mileage_dec_graph' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:10240'], // Ganti ke nullable
+
+            'mileage_jan_2026'  => ['required', 'numeric', 'min:0'],
+            'mileage_jan_graph' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:10240'], // Ganti ke nullable
+
+            'mileage_feb_2026'  => ['required', 'numeric', 'min:0'],
+            'mileage_feb_graph' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:10240'], // Ganti ke nullable
+
+            'mileage_mar_2026'  => ['required', 'numeric', 'min:0'],
+            'mileage_mar_graph' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:10240'], // Ganti ke nullable
 
             // ── Section 9: Pengalaman Pacer ─────────────────────────
             'is_pacer_experience' => ['required','in:pernah,tidak'],
@@ -63,10 +68,10 @@ class CandidateRegistrationRequest extends FormRequest
         ];
 
         // ── Conditional: Full Marathon ──────────────────────────────
-        if ($this->input('is_full_marathon') === 'pernah') {
-            $rules['fm_event']       = ['required','string','max:255'];
-            $rules['fm_year']        = ['required','digits:4','integer','min:2000','max:'.date('Y')];
-            $rules['fm_certificate'] = ['required','file','mimes:jpg,jpeg,png','max:10240'];
+        if ($this->is_full_marathon === 'pernah') {
+            $rules['fm_event'] = ['required', 'string', 'max:255'];
+            $rules['fm_year'] = ['required', 'numeric', 'min:2010', 'max:'.date('Y')];
+            $rules['fm_certificate'] = ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'];
         }
 
         // ── Conditional: Half Marathon ──────────────────────────────

@@ -18,13 +18,19 @@ class CandidateController extends Controller
         $data = $request->validated();
 
         // ── Helper: simpan file ke disk private ──────────────────
-        $upload = fn(string $field, string $folder) =>
-            $request->hasFile($field)
-                ? $request->file($field)->store($folder, 'private')
-                : null;
+    $upload = fn(string $field, string $folder) =>
+        $request->hasFile($field)
+            ? $request->file($field)->store($folder, 'private')
+            : null;
 
         // ── Section 1: KTP ───────────────────────────────────────
         $data['ktp_file'] = $upload('ktp_file', 'ktp');
+     // ── TAMBAHKAN INI: Konversi tanggal DD-MM-YYYY → YYYY-MM-DD ──
+    if (!empty($data['tanggal_lahir'])) {
+        if (preg_match('/^(\d{2})-(\d{2})-(\d{4})$/', $data['tanggal_lahir'], $m)) {
+            $data['tanggal_lahir'] = "{$m[3]}-{$m[2]}-{$m[1]}";
+        }
+    }
 
         // ── Section 2 & 3: FM / HM ───────────────────────────────
         $data['is_full_marathon'] = $data['is_full_marathon'] === 'pernah';

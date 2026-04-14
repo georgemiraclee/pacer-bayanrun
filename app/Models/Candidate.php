@@ -12,7 +12,7 @@ class Candidate extends Model
 
     protected $fillable = [
         // Data Pribadi
-        'email', 'nama', 'tanggal_lahir', 'domisili', 'alamat',
+        'email', 'nik', 'nama', 'tanggal_lahir', 'domisili', 'alamat',
         'ktp_file', 'instagram', 'strava',
         // Full & Half Marathon
         'is_full_marathon', 'fm_event', 'fm_year', 'fm_certificate',
@@ -28,10 +28,10 @@ class Candidate extends Model
         'mileage_feb_2026', 'mileage_feb_graph',
         'mileage_mar_2026', 'mileage_mar_graph',
         // Best Time
-        'best_time_fm',  'best_time_fm_file',
-        'best_time_hm',  'best_time_hm_file',
-        'best_time_10k', 'best_time_10k_file',
-        'best_time_5k',  'best_time_5k_file',
+        'best_time_fm', 'best_time_fm_file',
+        'best_time_hm', 'best_time_hm_file',
+        'best_time_10k','best_time_10k_file',
+        'best_time_5k', 'best_time_5k_file',
         // Pacer Experience
         'is_pacer_experience', 'pacer_event_list', 'pacer_distance_pace',
         // Essay
@@ -45,7 +45,9 @@ class Candidate extends Model
     ];
 
     protected $casts = [
-        'tanggal_lahir'        => 'date',
+        // ── PENTING: tanggal_lahir disimpan sebagai STRING DD-MM-YYYY dari OCR ──
+        // Jangan di-cast ke 'date' karena format DD-MM-YYYY tidak dikenali Carbon.
+        // Gunakan method tanggalLahirFormatted() untuk display.
         'is_full_marathon'     => 'boolean',
         'is_half_marathon'     => 'boolean',
         'is_pacer_experience'  => 'boolean',
@@ -54,18 +56,54 @@ class Candidate extends Model
         'status'               => CandidateStatus::class,
     ];
 
-    // ── Helpers ─────────────────────────────────────────────────
-
-    public function isPending(): bool   { return $this->status === CandidateStatus::Pending; }
-    public function isVerified(): bool  { return $this->status === CandidateStatus::Verified; }
-    public function isRejected(): bool  { return $this->status === CandidateStatus::Rejected; }
-
-    public function hasRoadRace(): bool
+    // ── Helper: tampilkan tanggal lahir ─────────────────────────────
+    // Mendukung format: DD-MM-YYYY, YYYY-MM-DD, DD/MM/YYYY
+    public function getTanggalLahirFormattedAttribute(): string
     {
-        return $this->is_full_marathon || $this->is_half_marathon
-            || $this->is_10k === 'pernah' || $this->is_5k === 'pernah';
+        $raw = $this->tanggal_lahir ?? '';
+        if (empty($raw)) return '—';
+
+        // Sudah DD-MM-YYYY → tampilkan langsung
+        if (preg_match('/^(\d{2})-(\d{2})-(\d{4})$/', $raw, $m)) {
+            $bulan = ['','Januari','Februari','Maret','April','Mei','Juni',
+                      'Juli','Agustus','September','Oktober','November','Desember'];
+            return $m[1].' '.($bulan[(int)$m[2]] ?? $m[2]).' '.$m[3];
+        }
+
+        // Format YYYY-MM-DD (dari input date HTML)
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $raw, $m)) {
+            $bulan = ['','Januari','Februari','Maret','April','Mei','Juni',
+                      'Juli','Agustus','September','Oktober','November','Desember'];
+            return $m[3].' '.($bulan[(int)$m[2]] ?? $m[2]).' '.$m[1];
+        }
+
+        return $raw; // fallback tampilkan apa adanya
     }
 
+    // ── Helper: hitung usia dari tanggal lahir string ────────────────
+    public function getUsiaAttribute(): ?int
+    {
+        $raw = $this->tanggal_lahir ?? '';
+        if (empty($raw)) return null;
+
+        try {
+            // Parse DD-MM-YYYY
+            if (preg_match('/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/', $raw, $m)) {
+                $tgl = \Carbon\Carbon::createFromDate((int)$m[3], (int)$m[2], (int)$m[1]);
+            }
+            // Parse YYYY-MM-DD
+            elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $raw, $m)) {
+                $tgl = \Carbon\Carbon::createFromDate((int)$m[1], (int)$m[2], (int)$m[3]);
+            } else {
+                return null;
+            }
+            return $tgl->age;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    // ── Helper: total mileage ────────────────────────────────────────
     public function totalMileage(): float
     {
         return (float)($this->mileage_dec_2025 ?? 0)
@@ -74,8 +112,12 @@ class Candidate extends Model
              + (float)($this->mileage_mar_2026 ?? 0);
     }
 
-    // ── Scopes ──────────────────────────────────────────────────
+    // ── Status helpers ───────────────────────────────────────────────
+    public function isPending(): bool  { return $this->status === CandidateStatus::Pending; }
+    public function isVerified(): bool { return $this->status === CandidateStatus::Verified; }
+    public function isRejected(): bool { return $this->status === CandidateStatus::Rejected; }
 
-    public function scopeByStatus($q, $s)    { return $q->where('status', $s); }
-    public function scopeByDomisili($q, $d)  { return $q->where('domisili', 'like', "%{$d}%"); }
+    // ── Scopes ──────────────────────────────────────────────────────
+    public function scopeByStatus($q, $s)   { return $q->where('status', $s); }
+    public function scopeByDomisili($q, $d) { return $q->where('domisili', 'like', "%{$d}%"); }
 }

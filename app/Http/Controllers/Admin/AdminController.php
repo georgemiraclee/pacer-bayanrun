@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -86,34 +87,52 @@ class AdminController extends Controller
             'catatan_admin' => ['nullable','string','max:1000'],
         ]);
         $candidate->update(['status' => $request->status, 'catatan_admin' => $request->catatan_admin]);
-        $label = match($request->status) { 'verified'=>'Diterima','rejected'=>'Ditolak', default=>'Di-reset ke Pending' };
+        $label = match($request->status) {
+            'verified' => 'Diterima', 'rejected' => 'Ditolak', default => 'Di-reset ke Pending'
+        };
         return back()->with('success', "Kandidat {$candidate->nama} berhasil {$label}.");
     }
 
-    // ── FILE DOWNLOADS ────────────────────────────────────────
+        private function download(Candidate $candidate, ?string $storedPath, string $prefix)
+        {
+            if (!$storedPath) abort(404);
 
-    private function download(Candidate $candidate, ?string $path, string $prefix): \Symfony\Component\HttpFoundation\StreamedResponse
+            $absolutePath = storage_path('app/private/' . $storedPath);
+
+            if (!file_exists($absolutePath)) abort(404);
+
+            $ext = pathinfo($storedPath, PATHINFO_EXTENSION);
+            $safeName = Str::slug($candidate->nama);
+            $filename = "{$prefix}_{$safeName}.{$ext}";
+
+            return response()->download($absolutePath, $filename);
+        }
+
+    private function getMimeType(string $ext): string
     {
-        abort_unless($path && Storage::disk('private')->exists($path), 404, 'File tidak ditemukan.');
-        $ext = pathinfo($path, PATHINFO_EXTENSION);
-        return Storage::disk('private')->download($path, "{$prefix}_{$candidate->nama}_#{$candidate->id}.{$ext}");
+        return match(strtolower($ext)) {
+            'pdf'  => 'application/pdf',
+            'jpg', 'jpeg' => 'image/jpeg',
+            'png'  => 'image/png',
+            default => 'application/octet-stream',
+        };
     }
 
-    public function downloadKtp(Candidate $c)         { return $this->download($c, $c->ktp_file,           'KTP'); }
-    public function downloadFmCert(Candidate $c)      { return $this->download($c, $c->fm_certificate,     'Sertifikat_FM'); }
-    public function downloadHmCert(Candidate $c)      { return $this->download($c, $c->hm_certificate,     'Sertifikat_HM'); }
-    public function download10kCert(Candidate $c)     { return $this->download($c, $c->race_10k_certificate,'Sertifikat_10K'); }
-    public function download5kCert(Candidate $c)      { return $this->download($c, $c->race_5k_certificate, 'Sertifikat_5K'); }
-    public function downloadTrailCert(Candidate $c)   { return $this->download($c, $c->trail_certificate,   'Sertifikat_Trail'); }
-    public function downloadMileageDec(Candidate $c)  { return $this->download($c, $c->mileage_dec_graph,   'Mileage_Des2025'); }
-    public function downloadMileageJan(Candidate $c)  { return $this->download($c, $c->mileage_jan_graph,   'Mileage_Jan2026'); }
-    public function downloadMileageFeb(Candidate $c)  { return $this->download($c, $c->mileage_feb_graph,   'Mileage_Feb2026'); }
-    public function downloadMileageMar(Candidate $c)  { return $this->download($c, $c->mileage_mar_graph,   'Mileage_Mar2026'); }
-    public function downloadBtFm(Candidate $c)        { return $this->download($c, $c->best_time_fm_file,   'BestTime_FM'); }
-    public function downloadBtHm(Candidate $c)        { return $this->download($c, $c->best_time_hm_file,   'BestTime_HM'); }
-    public function downloadBt10k(Candidate $c)       { return $this->download($c, $c->best_time_10k_file,  'BestTime_10K'); }
-    public function downloadBt5k(Candidate $c)        { return $this->download($c, $c->best_time_5k_file,   'BestTime_5K'); }
-    public function downloadWaiver(Candidate $c)      { return $this->download($c, $c->waiver_file,         'Waiver'); }
+    public function downloadKtp(Candidate $c)        { return $this->download($c, $c->ktp_file,            'KTP'); }
+    public function downloadFmCert(Candidate $c)     { return $this->download($c, $c->fm_certificate,      'Sertifikat_FM'); }
+    public function downloadHmCert(Candidate $c)     { return $this->download($c, $c->hm_certificate,      'Sertifikat_HM'); }
+    public function download10kCert(Candidate $c)    { return $this->download($c, $c->race_10k_certificate, 'Sertifikat_10K'); }
+    public function download5kCert(Candidate $c)     { return $this->download($c, $c->race_5k_certificate,  'Sertifikat_5K'); }
+    public function downloadTrailCert(Candidate $c)  { return $this->download($c, $c->trail_certificate,    'Sertifikat_Trail'); }
+    public function downloadMileageDec(Candidate $c) { return $this->download($c, $c->mileage_dec_graph,    'Mileage_Des2025'); }
+    public function downloadMileageJan(Candidate $c) { return $this->download($c, $c->mileage_jan_graph,    'Mileage_Jan2026'); }
+    public function downloadMileageFeb(Candidate $c) { return $this->download($c, $c->mileage_feb_graph,    'Mileage_Feb2026'); }
+    public function downloadMileageMar(Candidate $c) { return $this->download($c, $c->mileage_mar_graph,    'Mileage_Mar2026'); }
+    public function downloadBtFm(Candidate $c)       { return $this->download($c, $c->best_time_fm_file,    'BestTime_FM'); }
+    public function downloadBtHm(Candidate $c)       { return $this->download($c, $c->best_time_hm_file,    'BestTime_HM'); }
+    public function downloadBt10k(Candidate $c)      { return $this->download($c, $c->best_time_10k_file,   'BestTime_10K'); }
+    public function downloadBt5k(Candidate $c)       { return $this->download($c, $c->best_time_5k_file,    'BestTime_5K'); }
+    public function downloadWaiver(Candidate $c)     { return $this->download($c, $c->waiver_file,          'Waiver'); }
 
     // ── EXPORT CSV ───────────────────────────────────────────
 
@@ -123,29 +142,31 @@ class AdminController extends Controller
             ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
             ->get();
 
-        $fn = 'candidates_bayanrun_'.now()->format('Ymd_His').'.csv';
+        $fn      = 'candidates_bayanrun_'.now()->format('Ymd_His').'.csv';
         $headers = ['Content-Type'=>'text/csv','Content-Disposition'=>"attachment; filename={$fn}"];
 
         $callback = function() use ($candidates) {
             $f = fopen('php://output','w');
-            fputcsv($f, ['ID','Nama','Email','TTL','Domisili','Instagram','Strava',
+            fputcsv($f, ['ID','NIK','Nama','Email','Tgl Lahir','Domisili','Instagram','Strava',
                 'FM','HM','10K','5K','Mileage Total (km)',
                 'Best FM','Best HM','Best 10K','Best 5K',
                 'Pacer Exp','Komitmen','Izin Keluarga','Status','Daftar']);
             foreach ($candidates as $c) {
                 fputcsv($f, [
-                    $c->id, $c->nama, $c->email,
-                    $c->tanggal_lahir->format('d/m/Y'), $c->domisili,
+                    $c->id, $c->nik ?? '', $c->nama, $c->email,
+                    $c->tanggal_lahir ?? '', $c->domisili,
                     $c->instagram, $c->strava,
-                    $c->is_full_marathon?'Ya':'Tidak',
-                    $c->is_half_marathon?'Ya':'Tidak',
+                    $c->is_full_marathon ? 'Ya' : 'Tidak',
+                    $c->is_half_marathon ? 'Ya' : 'Tidak',
                     $c->is_10k, $c->is_5k,
-                    number_format($c->totalMileage(),2),
-                    $c->best_time_fm??'-', $c->best_time_hm??'-',
-                    $c->best_time_10k??'-', $c->best_time_5k??'-',
-                    $c->is_pacer_experience?'Ya':'Tidak',
-                    $c->komitmen??'-', $c->izin_keluarga??'-',
-                    $c->status->label(), $c->created_at->format('d/m/Y H:i'),
+                    number_format($c->totalMileage(), 2),
+                    $c->best_time_fm  ?? '-', $c->best_time_hm  ?? '-',
+                    $c->best_time_10k ?? '-', $c->best_time_5k  ?? '-',
+                    $c->is_pacer_experience ? 'Ya' : 'Tidak',
+                    $c->komitmen      ?? '-',
+                    $c->izin_keluarga ?? '-',
+                    $c->status->label(),
+                    $c->created_at->format('d/m/Y H:i'),
                 ]);
             }
             fclose($f);
