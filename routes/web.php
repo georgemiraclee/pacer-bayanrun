@@ -68,6 +68,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::prefix('kandidat/{candidate}')->name('candidate.')->group(function () {
             Route::get('/',        [AdminController::class, 'show'])->name('show');
             Route::post('/status', [AdminController::class, 'updateStatus'])->name('status');
+            Route::post('/seleksi', [AdminController::class, 'updateHasilSeleksi'])->name('seleksi');
 
             // Preview inline (buka di browser tab baru)
             Route::get('/preview/ktp',         [AdminController::class, 'previewKtp'])->name('preview.ktp');
