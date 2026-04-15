@@ -195,6 +195,79 @@
         padding: 14px 20px;
         border-top: 1px solid #F5F5F5;
     }
+
+    /* ── MOBILE RESPONSIVE DASHBOARD ── */
+
+/* Table: ubah jadi card list di mobile */
+@media(max-width:640px){
+    .stat-grid { grid-template-columns: repeat(2,1fr); gap:10px; }
+
+    .stat-card { padding: 14px 16px; }
+    .stat-card .s-num { font-size: 28px; }
+
+    /* Filter bar */
+    .filter-bar { padding: 14px 16px; }
+    .filter-field { width: 100%; }
+    .filter-field input[type=text],
+    .filter-field select { width: 100%; box-sizing: border-box; }
+
+    /* Tombol filter row */
+    .filter-bar > form > div:last-child {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    .btn-filter, .btn-reset, .btn-csv { flex: 1; justify-content: center; text-align: center; }
+
+    /* Sembunyikan table header */
+    table thead { display: none; }
+
+    /* Tiap row jadi card */
+    table, tbody, tr, td { display: block; width: 100%; }
+
+    tbody tr {
+        border: 1px solid #EBEBEB;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        padding: 14px 16px;
+        background: #fff;
+        box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
+
+    tbody td {
+        padding: 4px 0;
+        border: none;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    /* Sembunyikan kolom # di mobile */
+    tbody td:first-child { display: none; }
+
+    /* Kandidat (nama+email) tetap di atas, full width */
+    tbody td:nth-child(2) {
+        padding-bottom: 8px;
+        margin-bottom: 4px;
+        border-bottom: 1px solid #F5F5F5;
+    }
+
+    /* Label pseudo sebelum value */
+    tbody td:nth-child(3)::before { content: "Domisili"; font-family:'Syne',sans-serif; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#C0C0C0; min-width:72px; padding-top:2px; }
+    tbody td:nth-child(4)::before { content: "Race"; font-family:'Syne',sans-serif; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#C0C0C0; min-width:72px; padding-top:2px; }
+    tbody td:nth-child(5)::before { content: "Status"; font-family:'Syne',sans-serif; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#C0C0C0; min-width:72px; padding-top:2px; }
+    tbody td:nth-child(6)::before { content: "Daftar"; font-family:'Syne',sans-serif; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#C0C0C0; min-width:72px; padding-top:2px; }
+
+    /* Tombol detail full width */
+    tbody td:last-child { margin-top: 10px; }
+    .btn-detail { width: 100%; justify-content: center; }
+
+    /* Pagination */
+    .pagination-wrap { padding: 12px 16px; }
+    .pagination-wrap nav { overflow-x: auto; }
+
+    /* Table head bar */
+    .table-head-bar { padding: 12px 16px; }
+}
 </style>
 @endpush
 

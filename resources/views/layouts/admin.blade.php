@@ -27,6 +27,9 @@
             --white:   #FFFFFF;
             --shadow:  0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
             --shadow-md: 0 4px 20px rgba(0,0,0,.07);
+            --sidebar-w: 240px;
+            --topbar-h: 58px;
+            --transition: .25s cubic-bezier(.4,0,.2,1);
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -45,7 +48,7 @@
            SIDEBAR
         ══════════════════════════════════════ */
         .sidebar {
-            width: 240px;
+            width: var(--sidebar-w);
             flex-shrink: 0;
             background: var(--white);
             border-right: 1px solid var(--gray-200);
@@ -53,8 +56,9 @@
             flex-direction: column;
             position: fixed;
             left: 0; top: 0; bottom: 0;
-            z-index: 100;
+            z-index: 200;
             box-shadow: var(--shadow-md);
+            transition: transform var(--transition);
         }
 
         .sidebar-logo {
@@ -132,24 +136,46 @@
         .nav-link.danger:hover svg { color: var(--red); }
 
         /* ══════════════════════════════════════
+           SIDEBAR OVERLAY (mobile backdrop)
+        ══════════════════════════════════════ */
+        .sidebar-overlay {
+            display: none;
+            position: fixed; inset: 0; z-index: 199;
+            background: rgba(0,0,0,.45);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            animation: overlayFadeIn .2s ease forwards;
+        }
+        .sidebar-overlay.open { display: block; }
+        @keyframes overlayFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        /* ══════════════════════════════════════
            MAIN CONTENT
         ══════════════════════════════════════ */
         .main-wrap {
-            margin-left: 240px;
+            margin-left: var(--sidebar-w);
             flex: 1;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            transition: margin-left var(--transition);
         }
 
         .topbar {
             background: var(--white);
             border-bottom: 1px solid var(--gray-200);
             padding: 0 28px;
-            height: 58px;
+            height: var(--topbar-h);
             display: flex; align-items: center; justify-content: space-between;
             position: sticky; top: 0; z-index: 50;
             box-shadow: var(--shadow);
+            gap: 12px;
+        }
+        .topbar-left {
+            display: flex; align-items: center; gap: 12px;
         }
         .topbar-title {
             font-family: 'Syne', sans-serif;
@@ -158,7 +184,26 @@
         }
         .topbar-date {
             font-size: 12px; color: var(--gray-400);
+            white-space: nowrap;
         }
+
+        /* ── Hamburger Button ── */
+        .hamburger-btn {
+            display: none;
+            align-items: center; justify-content: center;
+            width: 36px; height: 36px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 9px; background: none;
+            cursor: pointer; color: var(--gray-600);
+            transition: all .15s;
+            flex-shrink: 0;
+        }
+        .hamburger-btn:hover {
+            background: var(--gray-100);
+            color: var(--gray-800);
+            border-color: var(--gray-400);
+        }
+        .hamburger-btn svg { display: block; }
 
         .page-content {
             padding: 28px;
@@ -182,16 +227,77 @@
             from { opacity:0; transform:translateY(-10px) scale(.95); }
             to   { opacity:1; transform:translateY(0) scale(1); }
         }
+
+        /* ══════════════════════════════════════
+           RESPONSIVE — TABLET (≤ 1024px)
+        ══════════════════════════════════════ */
+        @media (max-width: 1024px) {
+            :root { --sidebar-w: 220px; }
+        }
+
+        /* ══════════════════════════════════════
+           RESPONSIVE — MOBILE (≤ 768px)
+        ══════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
+                box-shadow: none;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: 4px 0 40px rgba(0,0,0,.18);
+            }
+
+            .main-wrap {
+                margin-left: 0;
+            }
+
+            .hamburger-btn {
+                display: flex;
+            }
+
+            .topbar {
+                padding: 0 16px;
+            }
+
+            .topbar-date {
+                display: none;
+            }
+
+            .page-content {
+                padding: 16px;
+            }
+
+            .admin-toast {
+                top: auto;
+                bottom: 18px;
+                right: 16px;
+                left: 16px;
+                max-width: none;
+            }
+        }
+
+        /* ══════════════════════════════════════
+           RESPONSIVE — SMALL MOBILE (≤ 480px)
+        ══════════════════════════════════════ */
+        @media (max-width: 480px) {
+            .sidebar { width: 80vw; max-width: 300px; }
+            .page-content { padding: 12px; }
+        }
     </style>
 
     @stack('admin-styles')
 </head>
 <body>
 
+{{-- ══ Sidebar Overlay Backdrop (mobile) ══ --}}
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
 {{-- ══════════════════════════════════════
      SIDEBAR
 ══════════════════════════════════════ --}}
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
         <img src="https://res.cloudinary.com/djs5pi7ev/image/upload/q_auto/f_auto/v1775466723/LOGO_BR2026_vbixvo.png"
              alt="Bayan Run 2026">
@@ -253,7 +359,15 @@
 ══════════════════════════════════════ --}}
 <div class="main-wrap">
     <header class="topbar">
-        <span class="topbar-title">@yield('title', 'Dashboard')</span>
+        <div class="topbar-left">
+            {{-- Hamburger — hanya muncul di mobile --}}
+            <button class="hamburger-btn" id="sidebar-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="sidebar">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+            <span class="topbar-title">@yield('title', 'Dashboard')</span>
+        </div>
         <span class="topbar-date">{{ now()->isoFormat('dddd, D MMMM Y') }}</span>
     </header>
 
@@ -276,5 +390,51 @@
 </div>
 
 @stack('admin-scripts')
+
+<script>
+(function () {
+    const toggle  = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+
+    function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('open');
+        toggle.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+    }
+
+    function toggleSidebar() {
+        sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+    }
+
+    toggle.addEventListener('click', toggleSidebar);
+    overlay.addEventListener('click', closeSidebar);
+
+    // Tutup otomatis saat klik nav link di mobile
+    sidebar.querySelectorAll('a.nav-link').forEach(function (link) {
+        link.addEventListener('click', function () {
+            if (window.innerWidth <= 768) closeSidebar();
+        });
+    });
+
+    // Tutup saat tekan Escape
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeSidebar();
+    });
+
+    // Reset state saat resize ke desktop
+    window.addEventListener('resize', function () {
+        if (window.innerWidth > 768) closeSidebar();
+    });
+})();
+</script>
 </body>
 </html>

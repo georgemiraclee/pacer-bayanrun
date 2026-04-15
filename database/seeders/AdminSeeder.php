@@ -13,9 +13,9 @@ class AdminSeeder extends Seeder
         Admin::create([
             'name'     => 'Admin Bayan Run',
             'email'    => 'admin@bayanrun.com',
-            'password' => Hash::make('admin123'),
+            'password' => Hash::make('B4y4nRun2026!'),
         ]);
 
-        $this->command->info('✅ Admin created: admin@bayanrun.com / admin123');
+        $this->command->info('✅ Admin created: admin@bayanrun.com / B4y4nRun2026!');
     }
 }

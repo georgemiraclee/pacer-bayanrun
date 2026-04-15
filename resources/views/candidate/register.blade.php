@@ -433,6 +433,22 @@
                     <input type="email" name="email" value="{{ old('email') }}" placeholder="nama@email.com" class="{{ $errors->has('email')?'err':'' }}">
                     @error('email')<span class="err-msg">{{ $message }}</span>@enderror
                 </div>
+                <div class="field">
+                    <label class="label">Nomor WhatsApp / Telepon <span class="req">*</span></label>
+                    <input type="text" 
+                        name="no_hp" 
+                        value="{{ old('no_hp') }}" 
+                        placeholder="0812-3456-7890"
+                        class="{{ $errors->has('no_hp')?'err':'' }}">
+                    
+                    <p style="font-size:11px; color:#AAAAAA; margin-top:4px;">
+                        Nomor aktif yang dapat dihubungi via WhatsApp
+                    </p>
+
+                    @error('no_hp')
+                        <span class="err-msg">{{ $message }}</span>
+                    @enderror
+                </div>
 
                 {{-- KTP OCR CARD --}}
                 <div id="ktpOcrCard" class="ktp-ocr-card">

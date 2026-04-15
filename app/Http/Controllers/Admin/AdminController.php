@@ -148,7 +148,7 @@ class AdminController extends Controller
 
     // ── EXPORT CSV ───────────────────────────────────────────
 
-    public function exportCsv(Request $request)
+    public function exportCsv(Request $request) 
     {
         $candidates = Candidate::query()
             ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
@@ -159,13 +159,14 @@ class AdminController extends Controller
 
         $callback = function() use ($candidates) {
             $f = fopen('php://output','w');
-            fputcsv($f, ['ID','NIK','Nama','Email','Tgl Lahir','Domisili','Instagram','Strava',
+            fputcsv($f, ['ID','NIK','Nama','Email','WhatsApp',' Tgl Lahir','Domisili','Instagram','Strava',
                 'FM','HM','10K','5K','Mileage Total (km)',
                 'Best FM','Best HM','Best 10K','Best 5K',
                 'Pacer Exp','Komitmen','Izin Keluarga','Status','Daftar']);
             foreach ($candidates as $c) {
                 fputcsv($f, [
                     $c->id, $c->nik ?? '', $c->nama, $c->email,
+                    $c->no_hp ?? '',
                     $c->tanggal_lahir ?? '', $c->domisili,
                     $c->instagram, $c->strava,
                     $c->is_full_marathon ? 'Ya' : 'Tidak',

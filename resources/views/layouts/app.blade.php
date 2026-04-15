@@ -351,7 +351,7 @@
 
 <footer class="site-footer">
     <img src="https://res.cloudinary.com/djs5pi7ev/image/upload/q_auto/f_auto/v1775466723/LOGO_BR2026_vbixvo.png" alt="Bayan Run 2026">
-    <p>© 2026 Bayan Run · Sistem Pendaftaran Pacer Resmi</p>
+    <p>© 2026 Bayan Run </p>
 </footer>
 
 @stack('scripts')

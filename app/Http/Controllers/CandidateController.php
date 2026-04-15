@@ -8,10 +8,11 @@ use Illuminate\Support\Facades\Storage;
 
 class CandidateController extends Controller
 {
-    public function create()
-    {
-        return view('candidate.register');
-    }
+        public function create()
+        {
+            $candidate = new \App\Models\Candidate(); // object kosong
+            return view('candidate.register', compact('candidate'));
+        }
 
     public function store(CandidateRegistrationRequest $request)
     {
