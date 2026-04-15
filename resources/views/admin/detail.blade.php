@@ -301,6 +301,58 @@
         font-family:'Syne',sans-serif; font-size:9px; font-weight:700;
         letter-spacing:.08em; text-transform:uppercase; color:#888;
     }
+    /* ── MOBILE RESPONSIVE DETAIL ── */
+@media(max-width:640px){
+
+    /* Hero */
+    .hero-panel {
+        padding: 16px 18px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .hero-panel h1 { font-size: 17px; }
+
+    /* Panel */
+    .panel-body { padding: 10px 14px; }
+    .panel-head { padding: 10px 14px; }
+
+    /* Info rows: stack label di atas value */
+    .ir { flex-direction: column; gap: 3px; padding: 10px 0; }
+    .ik { min-width: unset; }
+
+    /* Mileage grid: 1 kolom di mobile */
+    .mileage-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .m-card { padding: 10px 12px; }
+    .m-card .km-val { font-size: 18px; }
+
+    /* Thumbnail lebih kecil */
+    .thumb-wrap { max-width: 100%; }
+    .thumb-wrap img { height: 140px; }
+
+    /* Modal full screen di mobile */
+    #preview-modal { padding: 0; align-items: flex-end; }
+    .modal-box {
+        border-radius: 16px 16px 0 0;
+        max-height: 92vh;
+        max-width: 100%;
+    }
+    #modal-iframe { height: 70vh; }
+    #modal-img { max-height: 70vh; }
+
+    /* Action buttons */
+    .action-btn { font-size: 10px; padding: 10px; }
+    .submit-btn { padding: 11px; }
+
+    /* Back link */
+    .back-link { margin-bottom: 14px; }
+}
+
+/* Layar sangat kecil (< 380px) */
+@media(max-width:380px){
+    .mileage-grid { grid-template-columns: 1fr; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+}
 </style>
 @endpush
 
