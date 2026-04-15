@@ -25,6 +25,7 @@
     }
     .hero-panel h1 { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:#111; }
     .hero-panel p  { font-size:12px; color:#AAAAAA; margin-top:3px; }
+    .hero-badges   { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 
     /* ── 2-col layout ── */
     .detail-grid { display:grid; grid-template-columns:1fr 290px; gap:18px; align-items:start; }
@@ -76,9 +77,12 @@
         font-family: 'Syne', sans-serif;
         font-size: 10px; font-weight: 700;
     }
-    .badge-pending  { background:#FEF3C7; color:#D97706; }
-    .badge-verified { background:#DCFCE7; color:#15803D; }
-    .badge-rejected { background:#FFE4E7; color:#E8001E; }
+    .badge-pending      { background:#FEF3C7; color:#D97706; }
+    .badge-verified     { background:#DCFCE7; color:#15803D; }
+    .badge-rejected     { background:#FFE4E7; color:#E8001E; }
+    .badge-lolos        { background:#DCFCE7; color:#15803D; }
+    .badge-tidak_lolos  { background:#FFE4E7; color:#E8001E; }
+    .badge-belum        { background:#F3F4F6; color:#6B7280; }
 
     /* ── Preview button ── */
     .dl-btn {
@@ -107,7 +111,7 @@
     .m-card .km-val { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:#111; }
     .m-card .km-unit { font-size:12px; color:#AAA; margin-left:2px; }
 
-    /* ── Action buttons ── */
+    /* ── Action buttons (verifikasi) ── */
     .action-btn {
         width: 100%; padding: 11px; border-radius: 10px;
         border: 1.5px solid #E8E8E8;
@@ -123,6 +127,24 @@
     .action-btn.reject:hover, .action-btn.reject.active {
         background: #FFE4E7; border-color: #E8001E; color: #E8001E;
     }
+
+    /* ── Action buttons (seleksi pacer) ── */
+    .seleksi-btn {
+        width: 100%; padding: 11px; border-radius: 10px;
+        border: 1.5px solid #E8E8E8;
+        background: #FAFAFA; color: #888;
+        font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+        letter-spacing: .08em; text-transform: uppercase;
+        cursor: pointer; transition: all .15s;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .seleksi-btn.lolos-btn:hover, .seleksi-btn.lolos-btn.active {
+        background: #DCFCE7; border-color: #16A34A; color: #15803D;
+    }
+    .seleksi-btn.tidak-lolos-btn:hover, .seleksi-btn.tidak-lolos-btn.active {
+        background: #FFE4E7; border-color: #E8001E; color: #E8001E;
+    }
+
     .submit-btn {
         width: 100%; padding: 12px; border-radius: 10px; border: none;
         font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
@@ -133,6 +155,10 @@
     .sub-approve:hover { background: #15803D; }
     .sub-reject  { background: #E8001E; color: #fff; }
     .sub-reject:hover  { background: #C0001A; }
+    .sub-lolos      { background: #16A34A; color: #fff; }
+    .sub-lolos:hover { background: #15803D; }
+    .sub-tidak      { background: #E8001E; color: #fff; }
+    .sub-tidak:hover { background: #C0001A; }
 
     textarea.n-inp {
         width: 100%; background: #FAFAFA;
@@ -163,6 +189,43 @@
         margin: 2px;
     }
     .no-exp { font-size: 13px; color: #CCCCCC; font-style: italic; padding: 6px 0; }
+
+    /* ── Seleksi Result Display ── */
+    .seleksi-result {
+        text-align: center; padding: 18px 0 10px;
+    }
+    .seleksi-icon {
+        width: 52px; height: 52px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 10px;
+    }
+    .seleksi-icon.lolos    { background: #DCFCE7; }
+    .seleksi-icon.tidak    { background: #FFE4E7; }
+    .seleksi-label {
+        font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: .06em;
+    }
+    .seleksi-label.lolos { color: #15803D; }
+    .seleksi-label.tidak { color: #E8001E; }
+    .seleksi-meta {
+        font-size: 11px; color: #AAAAAA; margin-top: 4px;
+    }
+    .seleksi-catatan {
+        font-size: 12px; color: #666; line-height: 1.6;
+        background: #FAFAFA; padding: 10px 14px; border-radius: 8px;
+        border: 1px solid #F0F0F0; margin-top: 12px; text-align: left;
+    }
+
+    /* ── Locked notice ── */
+    .locked-notice {
+        background: #FAFAFA; border: 1.5px dashed #E8E8E8;
+        border-radius: 10px; padding: 16px;
+        text-align: center;
+    }
+    .locked-notice p {
+        font-size: 12px; color: #AAAAAA; line-height: 1.6;
+    }
+    .locked-notice strong { color: #888; }
 
     /* ══ PREVIEW MODAL ══ */
     #preview-modal {
@@ -212,21 +275,14 @@
         display: flex; align-items: center; justify-content: center;
         background: #F8F8F8; min-height: 200px; position: relative;
     }
-
-    /* Image preview */
     #modal-img {
         max-width: 100%; max-height: calc(92vh - 80px);
         object-fit: contain; display: block;
-        border-radius: 0;
     }
-
-    /* PDF preview */
     #modal-iframe {
         width: 100%; height: calc(92vh - 80px);
         border: none; display: block;
     }
-
-    /* Loading spinner */
     .modal-spinner {
         position: absolute; inset: 0;
         display: flex; flex-direction: column;
@@ -245,17 +301,13 @@
         font-family: 'Syne', sans-serif; font-size: 10px;
         font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #AAAAAA;
     }
-
-    /* Modal footer with download option */
     .modal-footer {
         padding: 10px 20px;
         border-top: 1px solid #F0F0F0;
         background: #FAFAFA;
         display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
     }
-    .modal-footer-label {
-        font-size: 11px; color: #AAAAAA;
-    }
+    .modal-footer-label { font-size: 11px; color: #AAAAAA; }
     .modal-dl-btn {
         display: inline-flex; align-items: center; gap: 6px;
         background: #111; color: #fff;
@@ -266,7 +318,6 @@
     }
     .modal-dl-btn:hover { background: #E8001E; }
 
-    /* thumbnail preview in inline panels */
     .thumb-wrap {
         margin-top: 8px;
         border: 1px solid #EBEBEB; border-radius: 10px;
@@ -288,71 +339,30 @@
     }
     .thumb-wrap:hover .thumb-overlay span { opacity:1; }
 
-    .pdf-thumb {
-        background: #FAFAFA;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        height: 80px; gap: 6px; cursor: pointer;
-        border: 1px solid #EBEBEB; border-radius: 10px;
-        max-width: 180px; margin-top: 8px; transition: all .15s;
+    /* ── MOBILE RESPONSIVE ── */
+    @media(max-width:640px){
+        .hero-panel { padding: 16px 18px; flex-direction: column; align-items: flex-start; gap: 10px; }
+        .hero-panel h1 { font-size: 17px; }
+        .panel-body { padding: 10px 14px; }
+        .panel-head { padding: 10px 14px; }
+        .ir { flex-direction: column; gap: 3px; padding: 10px 0; }
+        .ik { min-width: unset; }
+        .mileage-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+        .m-card { padding: 10px 12px; }
+        .m-card .km-val { font-size: 18px; }
+        .thumb-wrap { max-width: 100%; }
+        .thumb-wrap img { height: 140px; }
+        #preview-modal { padding: 0; align-items: flex-end; }
+        .modal-box { border-radius: 16px 16px 0 0; max-height: 92vh; max-width: 100%; }
+        #modal-iframe { height: 70vh; }
+        #modal-img { max-height: 70vh; }
+        .action-btn { font-size: 10px; padding: 10px; }
+        .submit-btn { padding: 11px; }
+        .back-link { margin-bottom: 14px; }
     }
-    .pdf-thumb:hover { background: #FFE4E7; border-color: #E8001E; }
-    .pdf-thumb svg { color: #E8001E; }
-    .pdf-thumb span {
-        font-family:'Syne',sans-serif; font-size:9px; font-weight:700;
-        letter-spacing:.08em; text-transform:uppercase; color:#888;
+    @media(max-width:380px){
+        .mileage-grid { grid-template-columns: 1fr; }
     }
-    /* ── MOBILE RESPONSIVE DETAIL ── */
-@media(max-width:640px){
-
-    /* Hero */
-    .hero-panel {
-        padding: 16px 18px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-    .hero-panel h1 { font-size: 17px; }
-
-    /* Panel */
-    .panel-body { padding: 10px 14px; }
-    .panel-head { padding: 10px 14px; }
-
-    /* Info rows: stack label di atas value */
-    .ir { flex-direction: column; gap: 3px; padding: 10px 0; }
-    .ik { min-width: unset; }
-
-    /* Mileage grid: 1 kolom di mobile */
-    .mileage-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .m-card { padding: 10px 12px; }
-    .m-card .km-val { font-size: 18px; }
-
-    /* Thumbnail lebih kecil */
-    .thumb-wrap { max-width: 100%; }
-    .thumb-wrap img { height: 140px; }
-
-    /* Modal full screen di mobile */
-    #preview-modal { padding: 0; align-items: flex-end; }
-    .modal-box {
-        border-radius: 16px 16px 0 0;
-        max-height: 92vh;
-        max-width: 100%;
-    }
-    #modal-iframe { height: 70vh; }
-    #modal-img { max-height: 70vh; }
-
-    /* Action buttons */
-    .action-btn { font-size: 10px; padding: 10px; }
-    .submit-btn { padding: 11px; }
-
-    /* Back link */
-    .back-link { margin-bottom: 14px; }
-}
-
-/* Layar sangat kecil (< 380px) */
-@media(max-width:380px){
-    .mileage-grid { grid-template-columns: 1fr; }
-    .stat-grid { grid-template-columns: 1fr 1fr; }
-}
 </style>
 @endpush
 
@@ -374,7 +384,6 @@
                 <div class="spinner-ring"></div>
                 <span class="spinner-text">Memuat dokumen…</span>
             </div>
-            {{-- diisi JS --}}
         </div>
         <div class="modal-footer">
             <span class="modal-footer-label" id="modal-file-label">—</span>
@@ -401,7 +410,29 @@
         <h1>{{ $candidate->nama }}</h1>
         <p>{{ $candidate->email }} · Daftar {{ $candidate->created_at->format('d M Y, H:i') }}</p>
     </div>
-    <span class="badge badge-{{ $candidate->status->value }}">{{ $candidate->status->label() }}</span>
+    <div class="hero-badges">
+        {{-- Badge verifikasi dokumen --}}
+        <span class="badge badge-{{ $candidate->status->value }}">{{ $candidate->status->label() }}</span>
+
+        {{-- Badge hasil seleksi pacer (hanya tampil jika sudah ada) --}}
+        @if(!$candidate->belumDiseleksi())
+            @if($candidate->isLolos())
+                <span class="badge badge-lolos">
+                    <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:4px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Lolos Pacer
+                </span>
+            @else
+                <span class="badge badge-tidak_lolos">
+                    <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:4px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Tidak Lolos Pacer
+                </span>
+            @endif
+        @endif
+    </div>
 </div>
 
 <div class="detail-grid">
@@ -437,7 +468,6 @@
                 <span class="ik">Strava</span>
                 <span class="iv"><a href="{{ $candidate->strava }}" target="_blank">{{ $candidate->strava }}</a></span>
             </div>
-            {{-- KTP inline --}}
             @if($candidate->ktp_file)
             <div class="ir">
                 <span class="ik">KTP</span>
@@ -462,79 +492,59 @@
             <span class="panel-head-label">Pengalaman Race</span>
         </div>
         <div class="panel-body" style="padding-top:6px; padding-bottom:6px;">
-            {{-- FM --}}
             <div class="ir">
                 <span class="ik">Full Marathon</span>
                 <span class="iv">
                     @if($candidate->is_full_marathon)
                         <strong>{{ $candidate->fm_event }}</strong> ({{ $candidate->fm_year }})
                         @if($candidate->fm_certificate)
-                        <br>
-                        <button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.fm', $candidate) }}', 'Sertifikat FM', 'image')">
-                            ↗ Sertifikat FM
-                        </button>
+                        <br><button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.fm', $candidate) }}', 'Sertifikat FM', 'image')">↗ Sertifikat FM</button>
                         @endif
                     @else<span class="iv-empty">Tidak Pernah</span>@endif
                 </span>
             </div>
-            {{-- HM --}}
             <div class="ir">
                 <span class="ik">Half Marathon</span>
                 <span class="iv">
                     @if($candidate->is_half_marathon)
                         <strong>{{ $candidate->hm_event }}</strong> ({{ $candidate->hm_year }})
                         @if($candidate->hm_certificate)
-                        <br>
-                        <button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.hm', $candidate) }}', 'Sertifikat HM', 'image')">
-                            ↗ Sertifikat HM
-                        </button>
+                        <br><button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.hm', $candidate) }}', 'Sertifikat HM', 'image')">↗ Sertifikat HM</button>
                         @endif
                     @else<span class="iv-empty">Tidak Pernah</span>@endif
                 </span>
             </div>
-            {{-- 10K --}}
             <div class="ir">
                 <span class="ik">10K</span>
                 <span class="iv">
                     @if($candidate->is_10k === 'pernah')
                         <strong>{{ $candidate->race_10k_event }}</strong> ({{ $candidate->race_10k_year }})
                         @if($candidate->race_10k_certificate)
-                        <br>
-                        <button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.10k', $candidate) }}', 'Sertifikat 10K', 'image')">
-                            ↗ Sertifikat 10K
-                        </button>
+                        <br><button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.10k', $candidate) }}', 'Sertifikat 10K', 'image')">↗ Sertifikat 10K</button>
                         @endif
                     @elseif($candidate->is_10k === 'skip')<span class="iv-empty">Dilewati</span>
                     @else<span class="iv-empty">Tidak Pernah</span>@endif
                 </span>
             </div>
-            {{-- 5K --}}
             <div class="ir">
                 <span class="ik">5K</span>
                 <span class="iv">
                     @if($candidate->is_5k === 'pernah')
                         <strong>{{ $candidate->race_5k_event }}</strong> ({{ $candidate->race_5k_year }})
                         @if($candidate->race_5k_certificate)
-                        <br>
-                        <button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.5k', $candidate) }}', 'Sertifikat 5K', 'image')">
-                            ↗ Sertifikat 5K
-                        </button>
+                        <br><button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.5k', $candidate) }}', 'Sertifikat 5K', 'image')">↗ Sertifikat 5K</button>
                         @endif
                     @elseif($candidate->is_5k === 'skip')<span class="iv-empty">Dilewati</span>
                     @else<span class="iv-empty">Tidak Pernah</span>@endif
                 </span>
             </div>
-            {{-- Trail --}}
             @if($candidate->trail_status === 'trail')
             <div class="ir">
                 <span class="ik">Trail</span>
                 <span class="iv">
                     <strong>{{ $candidate->trail_event }}</strong> ({{ $candidate->trail_year }})
                     @if($candidate->trail_certificate)
-                    <br>
-                    <button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.trail', $candidate) }}', 'Sertifikat Trail', 'image')">
-                        ↗ Sertifikat Trail
-                    </button>
+                    <br><button class="dl-btn" onclick="openPreview('{{ route('admin.candidate.preview.trail', $candidate) }}', 'Sertifikat Trail', 'image')">↗ Sertifikat Trail</button>
                     @endif
                 </span>
             </div>
@@ -658,73 +668,51 @@
 {{-- ══ RIGHT COLUMN ══ --}}
 <div>
 
-{{-- Dokumen --}}
-<div class="panel">
-    <div class="panel-head">
-        <svg width="13" height="13" fill="none" stroke="#AAAAAA" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-        </svg>
-        <span class="panel-head-label">Dokumen</span>
-    </div>
-    <div class="panel-body" style="display:flex; flex-direction:column; gap:8px;">
-
-        @if($candidate->ktp_file)
-        <button class="dl-btn" style="justify-content:center; margin-top:0;"
-                onclick="openPreview('{{ route('admin.candidate.preview.ktp', $candidate) }}', 'KTP – {{ $candidate->nama }}', 'image')">
-            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+    {{-- Dokumen --}}
+    <div class="panel">
+        <div class="panel-head">
+            <svg width="13" height="13" fill="none" stroke="#AAAAAA" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
-            Lihat KTP
-        </button>
-        @endif
-
-        @if($candidate->waiver_file)
-        <button class="dl-btn" style="justify-content:center; margin-top:0;"
-                onclick="openPreview('{{ route('admin.candidate.preview.waiver', $candidate) }}', 'Waiver – {{ $candidate->nama }}', 'pdf')">
-            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-            </svg>
-            Lihat Waiver
-        </button>
-        @endif
-
-        @if($candidate->fm_certificate)
-        <button class="dl-btn" style="justify-content:center; margin-top:0;"
-                onclick="openPreview('{{ route('admin.candidate.preview.fm', $candidate) }}', 'Sertifikat FM', 'image')">
-            ↗ Sertifikat FM
-        </button>
-        @endif
-
-        @if($candidate->hm_certificate)
-        <button class="dl-btn" style="justify-content:center; margin-top:0;"
-                onclick="openPreview('{{ route('admin.candidate.preview.hm', $candidate) }}', 'Sertifikat HM', 'image')">
-            ↗ Sertifikat HM
-        </button>
-        @endif
-
-        @if($candidate->race_10k_certificate)
-        <button class="dl-btn" style="justify-content:center; margin-top:0;"
-                onclick="openPreview('{{ route('admin.candidate.preview.10k', $candidate) }}', 'Sertifikat 10K', 'image')">
-            ↗ Sertifikat 10K
-        </button>
-        @endif
-
-        @if($candidate->race_5k_certificate)
-        <button class="dl-btn" style="justify-content:center; margin-top:0;"
-                onclick="openPreview('{{ route('admin.candidate.preview.5k', $candidate) }}', 'Sertifikat 5K', 'image')">
-            ↗ Sertifikat 5K
-        </button>
-        @endif
-
-        @if($candidate->trail_certificate)
-        <button class="dl-btn" style="justify-content:center; margin-top:0;"
-                onclick="openPreview('{{ route('admin.candidate.preview.trail', $candidate) }}', 'Sertifikat Trail', 'image')">
-            ↗ Sertifikat Trail
-        </button>
-        @endif
-
+            <span class="panel-head-label">Dokumen</span>
+        </div>
+        <div class="panel-body" style="display:flex; flex-direction:column; gap:8px;">
+            @if($candidate->ktp_file)
+            <button class="dl-btn" style="justify-content:center; margin-top:0;"
+                    onclick="openPreview('{{ route('admin.candidate.preview.ktp', $candidate) }}', 'KTP – {{ $candidate->nama }}', 'image')">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                Lihat KTP
+            </button>
+            @endif
+            @if($candidate->waiver_file)
+            <button class="dl-btn" style="justify-content:center; margin-top:0;"
+                    onclick="openPreview('{{ route('admin.candidate.preview.waiver', $candidate) }}', 'Waiver – {{ $candidate->nama }}', 'pdf')">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                Lihat Waiver
+            </button>
+            @endif
+            @if($candidate->fm_certificate)
+            <button class="dl-btn" style="justify-content:center; margin-top:0;"
+                    onclick="openPreview('{{ route('admin.candidate.preview.fm', $candidate) }}', 'Sertifikat FM', 'image')">↗ Sertifikat FM</button>
+            @endif
+            @if($candidate->hm_certificate)
+            <button class="dl-btn" style="justify-content:center; margin-top:0;"
+                    onclick="openPreview('{{ route('admin.candidate.preview.hm', $candidate) }}', 'Sertifikat HM', 'image')">↗ Sertifikat HM</button>
+            @endif
+            @if($candidate->race_10k_certificate)
+            <button class="dl-btn" style="justify-content:center; margin-top:0;"
+                    onclick="openPreview('{{ route('admin.candidate.preview.10k', $candidate) }}', 'Sertifikat 10K', 'image')">↗ Sertifikat 10K</button>
+            @endif
+            @if($candidate->race_5k_certificate)
+            <button class="dl-btn" style="justify-content:center; margin-top:0;"
+                    onclick="openPreview('{{ route('admin.candidate.preview.5k', $candidate) }}', 'Sertifikat 5K', 'image')">↗ Sertifikat 5K</button>
+            @endif
+            @if($candidate->trail_certificate)
+            <button class="dl-btn" style="justify-content:center; margin-top:0;"
+                    onclick="openPreview('{{ route('admin.candidate.preview.trail', $candidate) }}', 'Sertifikat Trail', 'image')">↗ Sertifikat Trail</button>
+            @endif
+        </div>
     </div>
-</div>
 
     {{-- Pernyataan Keabsahan --}}
     <div class="panel">
@@ -755,19 +743,18 @@
     </div>
     @endif
 
-    {{-- Status Action --}}
+    {{-- ── PANEL 1: Keputusan Verifikasi Dokumen ── --}}
     <div class="panel" x-data="{action:''}">
         <div class="panel-head">
             <svg width="13" height="13" fill="none" stroke="#AAAAAA" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
-            <span class="panel-head-label">Keputusan Seleksi</span>
+            <span class="panel-head-label">Verifikasi Dokumen</span>
         </div>
         <div class="panel-body">
-
             @if($candidate->isPending())
             <p style="font-size:11px; color:#AAAAAA; margin-bottom:12px; line-height:1.5;">
-                Pilih keputusan untuk kandidat ini. Tambahkan catatan jika diperlukan.
+                Verifikasi kelengkapan dokumen pendaftaran kandidat.
             </p>
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <button type="button"
@@ -777,7 +764,7 @@
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                     </svg>
-                    Terima Kandidat
+                    Terima / Verifikasi
                 </button>
                 <button type="button"
                         @click="action = action==='rejected' ? '' : 'rejected'"
@@ -786,47 +773,142 @@
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
-                    Tolak Kandidat
+                    Tolak Dokumen
                 </button>
             </div>
-
             <form method="POST" action="{{ route('admin.candidate.status', $candidate) }}"
                   x-show="action !== ''" x-transition style="margin-top:4px;">
                 @csrf
                 <input type="hidden" name="status" :value="action">
                 <textarea name="catatan_admin" rows="3" class="n-inp"
-                          placeholder="Catatan untuk kandidat (opsional)..."></textarea>
+                          placeholder="Catatan verifikasi (opsional)..."></textarea>
                 <button type="submit"
                         :class="action==='verified' ? 'sub-approve' : 'sub-reject'"
                         class="submit-btn"
-                        x-text="action==='verified' ? '✓ Konfirmasi Penerimaan' : '✕ Konfirmasi Penolakan'">
+                        x-text="action==='verified' ? '✓ Konfirmasi Verifikasi' : '✕ Konfirmasi Penolakan'">
                 </button>
             </form>
 
             @else
-            <div style="text-align:center; padding:14px 0;">
+            <div style="text-align:center; padding:10px 0 6px;">
                 @if($candidate->isVerified())
-                <div style="width:48px; height:48px; background:#DCFCE7; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 10px;">
-                    <svg width="24" height="24" fill="none" stroke="#15803D" viewBox="0 0 24 24">
+                <div style="width:40px; height:40px; background:#DCFCE7; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 8px;">
+                    <svg width="20" height="20" fill="none" stroke="#15803D" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                     </svg>
                 </div>
-                <p style="font-family:'Syne',sans-serif; font-size:12px; font-weight:700; color:#15803D; text-transform:uppercase;">Diterima</p>
+                <p style="font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:#15803D; text-transform:uppercase;">Dokumen Terverifikasi</p>
                 @else
-                <div style="width:48px; height:48px; background:#FFE4E7; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 10px;">
-                    <svg width="24" height="24" fill="none" stroke="#E8001E" viewBox="0 0 24 24">
+                <div style="width:40px; height:40px; background:#FFE4E7; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 8px;">
+                    <svg width="20" height="20" fill="none" stroke="#E8001E" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </div>
-                <p style="font-family:'Syne',sans-serif; font-size:12px; font-weight:700; color:#E8001E; text-transform:uppercase;">Ditolak</p>
+                <p style="font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:#E8001E; text-transform:uppercase;">Dokumen Ditolak</p>
                 @endif
-
                 <form method="POST" action="{{ route('admin.candidate.status', $candidate) }}">
                     @csrf
                     <input type="hidden" name="status" value="pending">
                     <button type="submit" class="reset-btn">Reset ke Pending</button>
                 </form>
             </div>
+            @endif
+        </div>
+    </div>
+
+    {{-- ── PANEL 2: Seleksi Akhir Pacer (hanya aktif jika sudah verified) ── --}}
+    <div class="panel" x-data="{action:''}">
+        <div class="panel-head">
+            <svg width="13" height="13" fill="none" stroke="#AAAAAA" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="panel-head-label">Seleksi Akhir Pacer</span>
+        </div>
+        <div class="panel-body">
+
+            @if(!$candidate->isVerified())
+            {{-- Terkunci — kandidat belum terverifikasi ── --}}
+            <div class="locked-notice">
+                <svg width="22" height="22" fill="none" stroke="#D0D0D0" viewBox="0 0 24 24" style="margin:0 auto 8px; display:block;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                <p>Seleksi akhir hanya tersedia untuk kandidat yang sudah <strong>Terverifikasi</strong>.</p>
+            </div>
+
+            @elseif($candidate->belumDiseleksi())
+            {{-- Belum ada keputusan seleksi ── --}}
+            <p style="font-size:11px; color:#AAAAAA; margin-bottom:12px; line-height:1.5;">
+                Tetapkan hasil seleksi akhir kandidat sebagai pacer Bayan Run 2026.
+            </p>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button type="button"
+                        @click="action = action==='lolos' ? '' : 'lolos'"
+                        :class="action==='lolos' ? 'active' : ''"
+                        class="seleksi-btn lolos-btn">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Lolos Seleksi Pacer
+                </button>
+                <button type="button"
+                        @click="action = action==='tidak_lolos' ? '' : 'tidak_lolos'"
+                        :class="action==='tidak_lolos' ? 'active' : ''"
+                        class="seleksi-btn tidak-lolos-btn">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Tidak Lolos Seleksi
+                </button>
+            </div>
+            <form method="POST" action="{{ route('admin.candidate.seleksi', $candidate) }}"
+                  x-show="action !== ''" x-transition style="margin-top:4px;">
+                @csrf
+                <input type="hidden" name="hasil_seleksi" :value="action">
+                <textarea name="catatan_seleksi" rows="3" class="n-inp"
+                          placeholder="Catatan seleksi untuk kandidat (opsional)..."></textarea>
+                <button type="submit"
+                        :class="action==='lolos' ? 'sub-lolos' : 'sub-tidak'"
+                        class="submit-btn"
+                        x-text="action==='lolos' ? '✓ Konfirmasi Lolos Pacer' : '✕ Konfirmasi Tidak Lolos'">
+                </button>
+            </form>
+
+            @else
+            {{-- Sudah ada keputusan seleksi ── --}}
+            <div class="seleksi-result">
+                @if($candidate->isLolos())
+                <div class="seleksi-icon lolos">
+                    <svg width="26" height="26" fill="none" stroke="#15803D" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <p class="seleksi-label lolos">Lolos Seleksi Pacer</p>
+                @else
+                <div class="seleksi-icon tidak">
+                    <svg width="26" height="26" fill="none" stroke="#E8001E" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <p class="seleksi-label tidak">Tidak Lolos Seleksi</p>
+                @endif
+
+                @if($candidate->seleksi_at)
+                <p class="seleksi-meta">Ditetapkan {{ $candidate->seleksi_at->format('d M Y, H:i') }}</p>
+                @endif
+
+                @if($candidate->catatan_seleksi)
+                <div class="seleksi-catatan">{{ $candidate->catatan_seleksi }}</div>
+                @endif
+            </div>
+
+            {{-- Reset seleksi ── --}}
+            <form method="POST" action="{{ route('admin.candidate.seleksi', $candidate) }}" style="margin-top:10px;">
+                @csrf
+                <input type="hidden" name="hasil_seleksi" value="reset">
+                <button type="submit" class="reset-btn">Ubah Keputusan Seleksi</button>
+            </form>
             @endif
 
         </div>
@@ -845,7 +927,6 @@ function openPreview(url, title, type) {
     const label   = document.getElementById('modal-file-label');
     const dlLink  = document.getElementById('modal-dl-link');
 
-    // Reset
     titleEl.textContent = title;
     label.textContent   = title;
     dlLink.href         = url;
@@ -881,7 +962,6 @@ function closePreview() {
     body.querySelectorAll('img, iframe').forEach(el => el.remove());
 }
 
-// Tutup dengan klik backdrop atau Escape
 document.getElementById('preview-modal').addEventListener('click', function(e) {
     if (e.target === this) closePreview();
 });
