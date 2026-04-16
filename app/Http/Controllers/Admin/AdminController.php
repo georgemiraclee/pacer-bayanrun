@@ -24,14 +24,18 @@ class AdminController extends Controller
     public function login(Request $request)
     {
         $creds = $request->validate([
-            'email'    => ['required','email'],
+            'email'    => ['required', 'email'],
             'password' => ['required'],
         ]);
+
         if (Auth::guard('admin')->attempt($creds, $request->boolean('remember'))) {
             $request->session()->regenerate();
             return redirect()->intended(route('admin.dashboard'));
         }
-        return back()->withErrors(['email' => 'Email atau password salah.'])->onlyInput('email');
+
+        return back()
+            ->withErrors(['email' => 'Email atau password salah.'])
+            ->onlyInput('email');
     }
 
     public function logout(Request $request)
@@ -48,21 +52,29 @@ class AdminController extends Controller
     {
         $query = Candidate::query()->latest();
 
-        if ($request->filled('status'))   $query->where('status', $request->status);
-        if ($request->filled('domisili')) $query->where('domisili', 'like', '%'.$request->domisili.'%');
+        // Filter: status verifikasi
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
 
-        // ── Filter hasil seleksi pacer (baru) ──
+        // Filter: domisili
+        if ($request->filled('domisili')) {
+            $query->where('domisili', 'like', '%' . $request->domisili . '%');
+        }
+
+        // Filter: hasil seleksi pacer
         if ($request->filled('seleksi')) {
-            match($request->seleksi) {
-                'lolos'        => $query->where('hasil_seleksi', 'lolos'),
-                'tidak_lolos'  => $query->where('hasil_seleksi', 'tidak_lolos'),
-                'belum'        => $query->whereNull('hasil_seleksi'),
-                default        => null,
+            match ($request->seleksi) {
+                'lolos'       => $query->where('hasil_seleksi', 'lolos'),
+                'tidak_lolos' => $query->where('hasil_seleksi', 'tidak_lolos'),
+                'belum'       => $query->whereNull('hasil_seleksi'),
+                default       => null,
             };
         }
 
+        // Filter: pengalaman race
         if ($request->filled('race')) {
-            match($request->race) {
+            match ($request->race) {
                 'fm'   => $query->where('is_full_marathon', true),
                 'hm'   => $query->where('is_half_marathon', true),
                 '10k'  => $query->where('is_10k', 'pernah'),
@@ -71,25 +83,38 @@ class AdminController extends Controller
                 default => null,
             };
         }
+
+        // Filter: search nama / email
         if ($request->filled('search')) {
             $s = $request->search;
-            $query->where(fn($q) => $q->where('nama','like',"%{$s}%")->orWhere('email','like',"%{$s}%"));
+            $query->where(fn ($q) =>
+                $q->where('nama', 'like', "%{$s}%")
+                  ->orWhere('email', 'like', "%{$s}%")
+            );
         }
 
         $candidates = $query->paginate(15)->withQueryString();
 
+        // ── Stats cards ──
         $stats = [
-            'total'        => Candidate::count(),
-            'pending'      => Candidate::where('status','pending')->count(),
-            'verified'     => Candidate::where('status','verified')->count(),
-            'rejected'     => Candidate::where('status','rejected')->count(),
-            // ── Stats seleksi (hanya dari yang sudah verified) ──
-            'lolos'        => Candidate::where('status','verified')->where('hasil_seleksi','lolos')->count(),
-            'tidak_lolos'  => Candidate::where('status','verified')->where('hasil_seleksi','tidak_lolos')->count(),
-            'belum_seleksi'=> Candidate::where('status','verified')->whereNull('hasil_seleksi')->count(),
+            'total'         => Candidate::count(),
+            'pending'       => Candidate::where('status', 'pending')->count(),
+            'verified'      => Candidate::where('status', 'verified')->count(),
+            'rejected'      => Candidate::where('status', 'rejected')->count(),
+
+            // Seleksi akhir (hanya dari yang sudah verified)
+            'lolos'         => Candidate::where('status', 'verified')
+                                        ->where('hasil_seleksi', 'lolos')
+                                        ->count(),
+            'tidak_lolos'   => Candidate::where('status', 'verified')
+                                        ->where('hasil_seleksi', 'tidak_lolos')
+                                        ->count(),
+            'belum_seleksi' => Candidate::where('status', 'verified')
+                                        ->whereNull('hasil_seleksi')
+                                        ->count(),
         ];
 
-        return view('admin.dashboard', compact('candidates','stats'));
+        return view('admin.dashboard', compact('candidates', 'stats'));
     }
 
     public function show(Candidate $candidate)
@@ -102,8 +127,8 @@ class AdminController extends Controller
     public function updateStatus(Request $request, Candidate $candidate)
     {
         $request->validate([
-            'status'        => ['required','in:verified,rejected,pending'],
-            'catatan_admin' => ['nullable','string','max:1000'],
+            'status'        => ['required', 'in:verified,rejected,pending'],
+            'catatan_admin' => ['nullable', 'string', 'max:1000'],
         ]);
 
         $data = [
@@ -111,7 +136,7 @@ class AdminController extends Controller
             'catatan_admin' => $request->catatan_admin,
         ];
 
-        // Reset hasil seleksi jika status di-reset ke pending
+        // Reset hasil seleksi otomatis jika status di-reset ke pending
         if ($request->status === 'pending') {
             $data['hasil_seleksi']   = null;
             $data['catatan_seleksi'] = null;
@@ -120,13 +145,16 @@ class AdminController extends Controller
 
         $candidate->update($data);
 
-        $label = match($request->status) {
-            'verified' => 'Diterima', 'rejected' => 'Ditolak', default => 'Di-reset ke Pending'
+        $label = match ($request->status) {
+            'verified' => 'Diterima',
+            'rejected' => 'Ditolak',
+            default    => 'Di-reset ke Pending',
         };
+
         return back()->with('success', "Kandidat {$candidate->nama} berhasil {$label}.");
     }
 
-    // ── UPDATE HASIL SELEKSI PACER (baru) ────────────────────
+    // ── UPDATE HASIL SELEKSI PACER ────────────────────────────
 
     public function updateHasilSeleksi(Request $request, Candidate $candidate)
     {
@@ -140,6 +168,7 @@ class AdminController extends Controller
             'catatan_seleksi' => ['nullable', 'string', 'max:1000'],
         ]);
 
+        // Reset seleksi
         if ($request->hasil_seleksi === 'reset') {
             $candidate->update([
                 'hasil_seleksi'   => null,
@@ -155,7 +184,10 @@ class AdminController extends Controller
             'seleksi_at'      => now(),
         ]);
 
-        $label = $request->hasil_seleksi === 'lolos' ? 'Lolos Seleksi Pacer' : 'Tidak Lolos Seleksi';
+        $label = $request->hasil_seleksi === 'lolos'
+            ? 'Lolos Seleksi Pacer'
+            : 'Tidak Lolos Seleksi';
+
         return back()->with('success', "Kandidat {$candidate->nama}: {$label}.");
     }
 
@@ -166,13 +198,15 @@ class AdminController extends Controller
         if (empty($storedPath)) {
             abort(404, 'Path tidak ditemukan di database');
         }
+
         if (!Storage::disk('private')->exists($storedPath)) {
             Log::error("File tidak ditemukan di disk private: " . $storedPath);
             abort(404, 'File fisik tidak ditemukan');
         }
+
         $absolutePath = Storage::disk('private')->path($storedPath);
-        $ext      = strtolower(pathinfo($storedPath, PATHINFO_EXTENSION));
-        $mimeType = $this->getMimeType($ext);
+        $ext          = strtolower(pathinfo($storedPath, PATHINFO_EXTENSION));
+        $mimeType     = $this->getMimeType($ext);
 
         return response()->file($absolutePath, [
             'Content-Type'        => $mimeType,
@@ -182,11 +216,11 @@ class AdminController extends Controller
 
     private function getMimeType(string $ext): string
     {
-        return match(strtolower($ext)) {
-            'pdf'         => 'application/pdf',
-            'jpg','jpeg'  => 'image/jpeg',
-            'png'         => 'image/png',
-            default       => 'application/octet-stream',
+        return match (strtolower($ext)) {
+            'pdf'        => 'application/pdf',
+            'jpg','jpeg' => 'image/jpeg',
+            'png'        => 'image/png',
+            default      => 'application/octet-stream',
         };
     }
 
@@ -211,50 +245,98 @@ class AdminController extends Controller
     public function exportCsv(Request $request)
     {
         $candidates = Candidate::query()
-            ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
-            ->when($request->filled('seleksi'), function($q) use ($request) {
-                match($request->seleksi) {
-                    'lolos'       => $q->where('hasil_seleksi','lolos'),
-                    'tidak_lolos' => $q->where('hasil_seleksi','tidak_lolos'),
+            ->when($request->filled('status'), fn ($q) =>
+                $q->where('status', $request->status)
+            )
+            ->when($request->filled('seleksi'), function ($q) use ($request) {
+                match ($request->seleksi) {
+                    'lolos'       => $q->where('hasil_seleksi', 'lolos'),
+                    'tidak_lolos' => $q->where('hasil_seleksi', 'tidak_lolos'),
                     'belum'       => $q->whereNull('hasil_seleksi'),
                     default       => null,
                 };
             })
+            ->when($request->filled('race'), function ($q) use ($request) {
+                match ($request->race) {
+                    'fm'   => $q->where('is_full_marathon', true),
+                    'hm'   => $q->where('is_half_marathon', true),
+                    '10k'  => $q->where('is_10k', 'pernah'),
+                    '5k'   => $q->where('is_5k', 'pernah'),
+                    'none' => $q->where('is_full_marathon', false)->where('is_half_marathon', false),
+                    default => null,
+                };
+            })
+            ->when($request->filled('domisili'), fn ($q) =>
+                $q->where('domisili', 'like', '%' . $request->domisili . '%')
+            )
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $s = $request->search;
+                $q->where(fn ($q2) =>
+                    $q2->where('nama', 'like', "%{$s}%")
+                       ->orWhere('email', 'like', "%{$s}%")
+                );
+            })
+            ->latest()
             ->get();
 
-        $fn      = 'candidates_bayanrun_'.now()->format('Ymd_His').'.csv';
-        $headers = ['Content-Type'=>'text/csv','Content-Disposition'=>"attachment; filename={$fn}"];
+        $fn      = 'candidates_bayanrun_' . now()->format('Ymd_His') . '.csv';
+        $headers = [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => "attachment; filename={$fn}",
+        ];
 
-        $callback = function() use ($candidates) {
-            $f = fopen('php://output','w');
-            fputcsv($f, ['ID','NIK','Nama','Email','WhatsApp','Tgl Lahir','Domisili','Instagram','Strava',
-                'FM','HM','10K','5K','Mileage Total (km)',
-                'Best FM','Best HM','Best 10K','Best 5K',
-                'Pacer Exp','Komitmen','Izin Keluarga',
-                'Status Verifikasi','Hasil Seleksi Pacer','Catatan Seleksi','Waktu Seleksi',
-                'Daftar']);
+        $callback = function () use ($candidates) {
+            $f = fopen('php://output', 'w');
+
+            // Header baris CSV
+            fputcsv($f, [
+                'ID', 'NIK', 'Nama', 'Email', 'WhatsApp', 'Tgl Lahir', 'Domisili',
+                'Instagram', 'Strava',
+                'FM', 'HM', '10K', '5K',
+                'Mileage Total (km)',
+                'Best FM', 'Best HM', 'Best 10K', 'Best 5K',
+                'Pacer Exp', 'Komitmen', 'Izin Keluarga',
+                'Status Verifikasi',
+                'Hasil Seleksi Pacer', 'Catatan Seleksi', 'Waktu Seleksi',
+                'Tgl Daftar',
+            ]);
+
             foreach ($candidates as $c) {
                 fputcsv($f, [
-                    $c->id, $c->nik ?? '', $c->nama, $c->email,
-                    $c->no_hp ?? '',
-                    $c->tanggal_lahir ?? '', $c->domisili,
-                    $c->instagram, $c->strava,
+                    $c->id,
+                    $c->nik              ?? '',
+                    $c->nama,
+                    $c->email,
+                    $c->no_hp            ?? '',
+                    $c->tanggal_lahir    ?? '',
+                    $c->domisili,
+                    $c->instagram,
+                    $c->strava,
                     $c->is_full_marathon ? 'Ya' : 'Tidak',
                     $c->is_half_marathon ? 'Ya' : 'Tidak',
-                    $c->is_10k, $c->is_5k,
+                    $c->is_10k,
+                    $c->is_5k,
                     number_format($c->totalMileage(), 2),
-                    $c->best_time_fm  ?? '-', $c->best_time_hm  ?? '-',
-                    $c->best_time_10k ?? '-', $c->best_time_5k  ?? '-',
+                    $c->best_time_fm    ?? '-',
+                    $c->best_time_hm    ?? '-',
+                    $c->best_time_10k   ?? '-',
+                    $c->best_time_5k    ?? '-',
                     $c->is_pacer_experience ? 'Ya' : 'Tidak',
-                    $c->komitmen      ?? '-',
-                    $c->izin_keluarga ?? '-',
+                    $c->komitmen        ?? '-',
+                    $c->izin_keluarga   ?? '-',
                     $c->status->label(),
-                    $c->hasilSeleksiLabel(),
+                    // Hasil seleksi pacer
+                    match ($c->hasil_seleksi) {
+                        'lolos'       => 'Lolos',
+                        'tidak_lolos' => 'Tidak Lolos',
+                        default       => 'Belum Diseleksi',
+                    },
                     $c->catatan_seleksi ?? '-',
                     $c->seleksi_at?->format('d/m/Y H:i') ?? '-',
                     $c->created_at->format('d/m/Y H:i'),
                 ]);
             }
+
             fclose($f);
         };
 
