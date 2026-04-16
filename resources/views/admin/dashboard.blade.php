@@ -6,11 +6,12 @@
     /* ── Stat Cards ── */
     .stat-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
         gap: 16px;
         margin-bottom: 24px;
     }
-    @media(max-width:900px){ .stat-grid{grid-template-columns:repeat(2,1fr);} }
+    @media(max-width:1100px){ .stat-grid{grid-template-columns:repeat(3,1fr);} }
+    @media(max-width:900px){  .stat-grid{grid-template-columns:repeat(2,1fr);} }
 
     .stat-card {
         background: #fff;
@@ -37,15 +38,17 @@
     .stat-card .s-sub {
         font-size: 12px; color: #BBBBBB;
     }
-    .stat-card.total  .s-num { color: #111; }
-    .stat-card.pending .s-num { color: #D97706; }
+    .stat-card.total    .s-num { color: #111; }
+    .stat-card.pending  .s-num { color: #D97706; }
     .stat-card.verified .s-num { color: #16A34A; }
     .stat-card.rejected .s-num { color: #E8001E; }
+    .stat-card.lolos    .s-num { color: #7C3AED; }
 
-    .stat-card.total   { border-top: 3px solid #111; }
-    .stat-card.pending { border-top: 3px solid #D97706; }
-    .stat-card.verified{ border-top: 3px solid #16A34A; }
-    .stat-card.rejected{ border-top: 3px solid #E8001E; }
+    .stat-card.total    { border-top: 3px solid #111; }
+    .stat-card.pending  { border-top: 3px solid #D97706; }
+    .stat-card.verified { border-top: 3px solid #16A34A; }
+    .stat-card.rejected { border-top: 3px solid #E8001E; }
+    .stat-card.lolos    { border-top: 3px solid #7C3AED; }
 
     /* ── Filter Bar ── */
     .filter-bar {
@@ -153,7 +156,7 @@
     tbody tr:hover { background: #FAFAFA; }
     tbody td { padding: 13px 18px; }
 
-    .cand-name { font-size: 14px; font-weight: 500; color: #111; }
+    .cand-name  { font-size: 14px; font-weight: 500; color: #111; }
     .cand-email { font-size: 12px; color: #AAAAAA; margin-top: 1px; }
 
     /* ── Badges ── */
@@ -163,11 +166,13 @@
         font-family: 'Syne', sans-serif;
         font-size: 10px; font-weight: 700;
     }
-    .badge-pending  { background: #FEF3C7; color: #D97706; }
-    .badge-verified { background: #DCFCE7; color: #15803D; }
-    .badge-rejected { background: #FFE4E7; color: #E8001E; }
-    .badge-fm       { background: #EDE9FE; color: #7C3AED; }
-    .badge-hm       { background: #DBEAFE; color: #2563EB; }
+    .badge-pending      { background: #FEF3C7; color: #D97706; }
+    .badge-verified     { background: #DCFCE7; color: #15803D; }
+    .badge-rejected     { background: #FFE4E7; color: #E8001E; }
+    .badge-fm           { background: #EDE9FE; color: #7C3AED; }
+    .badge-hm           { background: #DBEAFE; color: #2563EB; }
+    .badge-lolos        { background: #EDE9FE; color: #7C3AED; }
+    .badge-tidak-lolos  { background: #FFE4E7; color: #E8001E; }
 
     .btn-detail {
         display: inline-flex; align-items: center; gap: 5px;
@@ -188,7 +193,7 @@
     }
     .empty-state .emoji { font-size: 40px; margin-bottom: 14px; }
     .empty-state h3 { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:#333; margin-bottom:6px; }
-    .empty-state p { font-size:13px; color:#AAA; }
+    .empty-state p  { font-size:13px; color:#AAA; }
 
     /* ── Pagination override ── */
     .pagination-wrap {
@@ -196,78 +201,87 @@
         border-top: 1px solid #F5F5F5;
     }
 
-    /* ── MOBILE RESPONSIVE DASHBOARD ── */
-
-/* Table: ubah jadi card list di mobile */
-@media(max-width:640px){
-    .stat-grid { grid-template-columns: repeat(2,1fr); gap:10px; }
-
-    .stat-card { padding: 14px 16px; }
-    .stat-card .s-num { font-size: 28px; }
-
-    /* Filter bar */
-    .filter-bar { padding: 14px 16px; }
-    .filter-field { width: 100%; }
-    .filter-field input[type=text],
-    .filter-field select { width: 100%; box-sizing: border-box; }
-
-    /* Tombol filter row */
-    .filter-bar > form > div:last-child {
-        width: 100%;
-        flex-wrap: wrap;
-    }
-    .btn-filter, .btn-reset, .btn-csv { flex: 1; justify-content: center; text-align: center; }
-
-    /* Sembunyikan table header */
-    table thead { display: none; }
-
-    /* Tiap row jadi card */
-    table, tbody, tr, td { display: block; width: 100%; }
-
-    tbody tr {
-        border: 1px solid #EBEBEB;
+    /* ── Seleksi summary bar ── */
+    .seleksi-summary {
+        background: #FAF7FF;
+        border: 1px solid #DDD6FE;
         border-radius: 12px;
-        margin-bottom: 10px;
-        padding: 14px 16px;
-        background: #fff;
-        box-shadow: 0 1px 4px rgba(0,0,0,.04);
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        display: flex; flex-wrap: wrap; gap: 20px; align-items: center;
+    }
+    .seleksi-summary .ss-label {
+        font-family: 'Syne', sans-serif;
+        font-size: 9px; font-weight: 700;
+        letter-spacing: .1em; text-transform: uppercase;
+        color: #7C3AED;
+    }
+    .seleksi-summary .ss-group {
+        display: flex; align-items: center; gap: 8px;
+    }
+    .seleksi-summary .ss-num {
+        font-family: 'Syne', sans-serif;
+        font-size: 18px; font-weight: 800;
+    }
+    .seleksi-summary .ss-num.lolos     { color: #7C3AED; }
+    .seleksi-summary .ss-num.tidak     { color: #E8001E; }
+    .seleksi-summary .ss-num.belum     { color: #AAAAAA; }
+    .seleksi-summary .ss-divider       { width: 1px; height: 24px; background: #DDD6FE; }
+    .seleksi-summary .ss-pct {
+        font-size: 11px; color: #9C6DE0;
+        font-family: 'Syne', sans-serif; font-weight: 700;
     }
 
-    tbody td {
-        padding: 4px 0;
-        border: none;
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
+    /* ── MOBILE RESPONSIVE ── */
+    @media(max-width:640px){
+        .stat-grid { grid-template-columns: repeat(2,1fr); gap:10px; }
+        .stat-card { padding: 14px 16px; }
+        .stat-card .s-num { font-size: 28px; }
+
+        .filter-bar { padding: 14px 16px; }
+        .filter-field { width: 100%; }
+        .filter-field input[type=text],
+        .filter-field select { width: 100%; box-sizing: border-box; }
+        .filter-bar > form > div:last-child { width: 100%; flex-wrap: wrap; }
+        .btn-filter, .btn-reset, .btn-csv { flex: 1; justify-content: center; text-align: center; }
+
+        .seleksi-summary { padding: 12px 14px; gap: 12px; }
+
+        table thead { display: none; }
+        table, tbody, tr, td { display: block; width: 100%; }
+        tbody tr {
+            border: 1px solid #EBEBEB;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            padding: 14px 16px;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,.04);
+        }
+        tbody td {
+            padding: 4px 0;
+            border: none;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        tbody td:first-child { display: none; }
+        tbody td:nth-child(2) {
+            padding-bottom: 8px;
+            margin-bottom: 4px;
+            border-bottom: 1px solid #F5F5F5;
+        }
+        tbody td:nth-child(3)::before { content: "Domisili"; font-family:'Syne',sans-serif; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#C0C0C0; min-width:72px; padding-top:2px; }
+        tbody td:nth-child(4)::before { content: "Race";     font-family:'Syne',sans-serif; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#C0C0C0; min-width:72px; padding-top:2px; }
+        tbody td:nth-child(5)::before { content: "Status";   font-family:'Syne',sans-serif; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#C0C0C0; min-width:72px; padding-top:2px; }
+        tbody td:nth-child(6)::before { content: "Seleksi";  font-family:'Syne',sans-serif; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#C0C0C0; min-width:72px; padding-top:2px; }
+        tbody td:nth-child(7)::before { content: "Daftar";   font-family:'Syne',sans-serif; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#C0C0C0; min-width:72px; padding-top:2px; }
+        tbody td:last-child { margin-top: 10px; }
+        .btn-detail { width: 100%; justify-content: center; }
+
+        .pagination-wrap { padding: 12px 16px; }
+        .pagination-wrap nav { overflow-x: auto; }
+        .table-head-bar { padding: 12px 16px; }
     }
-
-    /* Sembunyikan kolom # di mobile */
-    tbody td:first-child { display: none; }
-
-    /* Kandidat (nama+email) tetap di atas, full width */
-    tbody td:nth-child(2) {
-        padding-bottom: 8px;
-        margin-bottom: 4px;
-        border-bottom: 1px solid #F5F5F5;
-    }
-
-    /* Label pseudo sebelum value */
-    tbody td:nth-child(3)::before { content: "Domisili"; font-family:'Syne',sans-serif; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#C0C0C0; min-width:72px; padding-top:2px; }
-    tbody td:nth-child(4)::before { content: "Race"; font-family:'Syne',sans-serif; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#C0C0C0; min-width:72px; padding-top:2px; }
-    tbody td:nth-child(5)::before { content: "Status"; font-family:'Syne',sans-serif; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#C0C0C0; min-width:72px; padding-top:2px; }
-    tbody td:nth-child(6)::before { content: "Daftar"; font-family:'Syne',sans-serif; font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#C0C0C0; min-width:72px; padding-top:2px; }
-
-    /* Tombol detail full width */
-    tbody td:last-child { margin-top: 10px; }
-    .btn-detail { width: 100%; justify-content: center; }
-
-    /* Pagination */
-    .pagination-wrap { padding: 12px 16px; }
-    .pagination-wrap nav { overflow-x: auto; }
-
-    /* Table head bar */
-    .table-head-bar { padding: 12px 16px; }
-}
 </style>
 @endpush
 
@@ -295,7 +309,47 @@
         <span class="s-num">{{ $stats['rejected'] }}</span>
         <span class="s-sub">Tidak lolos seleksi</span>
     </div>
+    <div class="stat-card lolos">
+        <span class="s-label">Lolos Pacer</span>
+        <span class="s-num">{{ $stats['lolos'] }}</span>
+        <span class="s-sub">Lolos seleksi akhir</span>
+    </div>
 </div>
+
+{{-- ── Seleksi Summary Bar (hanya tampil jika ada yang sudah diseleksi) ── --}}
+@if($stats['lolos'] > 0 || $stats['tidak_lolos'] > 0)
+@php
+    $totalSeleksi = $stats['lolos'] + $stats['tidak_lolos'];
+    $pctLolos = $totalSeleksi > 0 ? round($stats['lolos'] / $totalSeleksi * 100) : 0;
+@endphp
+<div class="seleksi-summary">
+    <span class="ss-label">Rekap Seleksi Pacer</span>
+    <div class="ss-divider"></div>
+    <div class="ss-group">
+        <span class="ss-num lolos">{{ $stats['lolos'] }}</span>
+        <div>
+            <div style="font-family:'Syne',sans-serif; font-size:9px; font-weight:700; text-transform:uppercase; color:#7C3AED;">Lolos</div>
+            <div class="ss-pct">{{ $pctLolos }}% dari yang diseleksi</div>
+        </div>
+    </div>
+    <div class="ss-divider"></div>
+    <div class="ss-group">
+        <span class="ss-num tidak">{{ $stats['tidak_lolos'] }}</span>
+        <div>
+            <div style="font-family:'Syne',sans-serif; font-size:9px; font-weight:700; text-transform:uppercase; color:#E8001E;">Tidak Lolos</div>
+            <div style="font-size:11px; color:#E8A0A0; font-family:'Syne',sans-serif; font-weight:700;">{{ 100 - $pctLolos }}% dari yang diseleksi</div>
+        </div>
+    </div>
+    <div class="ss-divider"></div>
+    <div class="ss-group">
+        <span class="ss-num belum">{{ $stats['belum_seleksi'] }}</span>
+        <div>
+            <div style="font-family:'Syne',sans-serif; font-size:9px; font-weight:700; text-transform:uppercase; color:#AAAAAA;">Belum Diseleksi</div>
+            <div style="font-size:11px; color:#CCCCCC; font-family:'Syne',sans-serif; font-weight:700;">Dari yang terverifikasi</div>
+        </div>
+    </div>
+</div>
+@endif
 
 {{-- ── Filter Bar ── --}}
 <div class="filter-bar">
@@ -326,6 +380,16 @@
                 <option value="10k"  {{ request('race')==='10k'  ?'selected':'' }}>10K</option>
                 <option value="5k"   {{ request('race')==='5k'   ?'selected':'' }}>5K</option>
                 <option value="none" {{ request('race')==='none' ?'selected':'' }}>Belum FM/HM</option>
+            </select>
+        </div>
+
+        <div class="filter-field">
+            <span class="f-label">Seleksi Pacer</span>
+            <select name="seleksi">
+                <option value="">Semua</option>
+                <option value="lolos"       {{ request('seleksi')==='lolos'       ?'selected':'' }}>Lolos</option>
+                <option value="tidak_lolos" {{ request('seleksi')==='tidak_lolos' ?'selected':'' }}>Tidak Lolos</option>
+                <option value="belum"       {{ request('seleksi')==='belum'       ?'selected':'' }}>Belum Diseleksi</option>
             </select>
         </div>
 
@@ -372,6 +436,7 @@
                     <th>Domisili</th>
                     <th>Race</th>
                     <th>Status</th>
+                    <th>Seleksi</th>
                     <th>Tgl Daftar</th>
                     <th></th>
                 </tr>
@@ -405,6 +470,25 @@
                         <span class="badge badge-{{ $c->status->value }}">
                             {{ $c->status->label() }}
                         </span>
+                    </td>
+                    <td>
+                        @if($c->hasil_seleksi === 'lolos')
+                            <span class="badge badge-lolos">
+                                <svg width="9" height="9" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:3px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Lolos
+                            </span>
+                        @elseif($c->hasil_seleksi === 'tidak_lolos')
+                            <span class="badge badge-tidak-lolos">
+                                <svg width="9" height="9" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:3px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                                Tidak Lolos
+                            </span>
+                        @else
+                            <span style="color:#CCC; font-size:12px;">—</span>
+                        @endif
                     </td>
                     <td style="font-size:12px; color:#AAAAAA;">
                         {{ $c->created_at->format('d M Y') }}
