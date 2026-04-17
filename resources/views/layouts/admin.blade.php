@@ -330,14 +330,14 @@
             Export CSV
         </a>
 
-        <a href="{{ route('candidate.register') }}" target="_blank"
+        <!--<a href="{{ route('candidate.register') }}" target="_blank"
            class="nav-link">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
             </svg>
             Lihat Form Publik
-        </a>
+        </a>-->
     </nav>
 
     <div class="sidebar-footer">

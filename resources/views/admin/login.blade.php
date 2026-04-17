@@ -199,7 +199,7 @@
         </div>
     </div>
 
-    <a href="{{ route('candidate.register') }}" class="back-link">← Kembali ke Form Pendaftaran</a>
+    <!--<a href="{{ route('candidate.register') }}" class="back-link">← Kembali ke Form Pendaftaran</a>-->
 </div>
 
 </body>

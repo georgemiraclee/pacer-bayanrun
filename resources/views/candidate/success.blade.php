@@ -52,13 +52,13 @@
         <a href="https://instagram.com/bayan_opem" style="color:#E8001E; text-decoration:none; font-weight:500;">@bayan_opem</a>
     </p>
 
-    <a href="{{ route('candidate.register') }}"
+     <!--<a href="{{ route('candidate.register') }}"
        style="display:inline-flex; align-items:center; gap:6px; margin-top:20px; font-size:12px; font-family:'Syne',sans-serif; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#999; text-decoration:none; transition:color .2s; animation:fadeUp .5s ease .5s both;">
         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
         Kembali ke Halaman Pendaftaran
-    </a>
+    </a>-->
 
 </div>
 @endsection
