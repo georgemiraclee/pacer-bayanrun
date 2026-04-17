@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Bayan Run 2026 — Pendaftaran Pacer Segera Hadir. Balikpapan, Kalimantan Timur.">
-    <title>Coming Soon — Bayan Run 2026</title>
+    <meta name="description" content="Bayan Run 2026 — Pendaftaran Pacer Ditutup. Balikpapan, Kalimantan Timur.">
+    <title>Bayan Run 2026 — Pendaftaran Pacer Ditutup</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,6 +27,10 @@
         --border:     rgba(0,0,0,0.08);
         --font:       'Montserrat', sans-serif;
         --marquee-h:  38px;
+
+        /* Closed state */
+        --closed:     #6b6b7b;
+        --closed-bg:  #f0f0f4;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -106,21 +110,21 @@
 
     /* Background deco */
     .bg-blob { position: absolute; border-radius: 50%; pointer-events: none; z-index: 0; }
-    .b1 { width: 560px; height: 560px; top: -180px; right: -120px; background: radial-gradient(circle, rgba(232,0,30,0.07) 0%, transparent 65%); animation: b1 18s ease-in-out infinite alternate; }
-    .b2 { width: 480px; height: 480px; bottom: -100px; left: -140px; background: radial-gradient(circle, rgba(0,63,181,0.07) 0%, transparent 65%); animation: b2 22s ease-in-out infinite alternate; }
-    .b3 { width: 280px; height: 280px; top: 42%; left: 52%; background: radial-gradient(circle, rgba(232,0,30,0.04) 0%, transparent 65%); animation: b2 14s ease-in-out infinite alternate-reverse; }
+    .b1 { width: 560px; height: 560px; top: -180px; right: -120px; background: radial-gradient(circle, rgba(107,107,123,0.07) 0%, transparent 65%); animation: b1 18s ease-in-out infinite alternate; }
+    .b2 { width: 480px; height: 480px; bottom: -100px; left: -140px; background: radial-gradient(circle, rgba(0,63,181,0.05) 0%, transparent 65%); animation: b2 22s ease-in-out infinite alternate; }
+    .b3 { width: 280px; height: 280px; top: 42%; left: 52%; background: radial-gradient(circle, rgba(107,107,123,0.04) 0%, transparent 65%); animation: b2 14s ease-in-out infinite alternate-reverse; }
     @keyframes b1 { from{transform:translate(0,0) scale(1)} to{transform:translate(-25px,20px) scale(1.1)} }
     @keyframes b2 { from{transform:translate(0,0) scale(1)} to{transform:translate(18px,-18px) scale(1.08)} }
 
     .bg-dots {
         position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0;
-        background-image: radial-gradient(circle, rgba(0,0,0,0.055) 1px, transparent 1px);
+        background-image: radial-gradient(circle, rgba(0,0,0,0.045) 1px, transparent 1px);
         background-size: 28px 28px;
     }
 
     /* Corner badge */
     #corner-logo { position: absolute; top: 20px; left: 24px; z-index: 6; opacity: 0; }
-    #corner-logo img { height: 38px; width: auto; }
+    #corner-logo img { height: 38px; width: auto; filter: grayscale(20%); }
     #edition-tag {
         position: absolute; top: 28px; right: 24px; z-index: 6; opacity: 0;
         font-size: 9px; font-weight: 700; letter-spacing: 0.2em;
@@ -157,77 +161,122 @@
         justify-content: center;
     }
 
-    /* Flag mini */
-    .flag-mini { display: inline-flex; gap: 2px; margin-bottom: 16px; opacity: 0; transform: translateY(10px); }
-    .flag-r { width: 20px; height: 13px; background: var(--red); border-radius: 2px 0 0 2px; }
-    .flag-w { width: 20px; height: 13px; background: #fff; border: 1px solid #ddd; }
-    .flag-b { width: 20px; height: 13px; background: var(--blue); border-radius: 0 2px 2px 0; }
-
-    /* Eyebrow */
-    .eyebrow {
+    /* ─── CLOSED BADGE ─── */
+    .closed-badge {
         display: inline-flex; align-items: center; gap: 8px;
-        padding: 5px 16px 5px 7px; border-radius: 99px;
-        background: rgba(232,0,30,0.08); border: 1px solid rgba(232,0,30,0.22);
+        padding: 6px 18px 6px 9px; border-radius: 99px;
+        background: rgba(107,107,123,0.10); border: 1px solid rgba(107,107,123,0.25);
         margin-bottom: 20px; opacity: 0; transform: translateY(14px);
     }
-    .eyebrow-dot-wrap { width: 20px; height: 20px; border-radius: 50%; background: rgba(232,0,30,0.14); display: flex; align-items: center; justify-content: center; }
-    .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); animation: blink 2.4s ease infinite; }
-    @keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.25;transform:scale(0.65)} }
-    .eyebrow-text { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--red-deep); }
+    .closed-icon-wrap {
+        width: 22px; height: 22px; border-radius: 50%;
+        background: rgba(107,107,123,0.16);
+        display: flex; align-items: center; justify-content: center;
+    }
+    .closed-icon { font-size: 11px; line-height: 1; }
+    .closed-badge-text {
+        font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+        text-transform: uppercase; color: var(--closed);
+    }
 
     /* Logo */
-    .cs-logo { height: clamp(60px,10vw,90px); width: auto; display: block; margin: 0 auto 14px; opacity: 0; transform: scale(0.88) translateY(12px); }
+    .cs-logo {
+        height: clamp(60px,10vw,90px); width: auto; display: block;
+        margin: 0 auto 16px; opacity: 0; transform: scale(0.88) translateY(12px);
+        filter: grayscale(30%) brightness(0.95);
+    }
 
     /* Headline */
-    .headline { font-size: clamp(40px,10vw,86px); font-weight: 900; letter-spacing: -0.045em; line-height: 0.93; margin-bottom: 12px; opacity: 0; transform: translateY(36px); display: block; color: var(--text-1); }
-    .headline em { font-style: normal; color: var(--red); }
+    .headline {
+        font-size: clamp(36px, 9vw, 80px); font-weight: 900;
+        letter-spacing: -0.04em; line-height: 0.95;
+        margin-bottom: 10px; opacity: 0; transform: translateY(36px);
+        display: block; color: var(--text-1);
+    }
+    .headline em { font-style: normal; color: var(--closed); }
 
     /* Accent line */
     #accent-line {
         width: 0; height: 3px; margin: 0 auto 10px; border-radius: 99px;
-        background: linear-gradient(90deg, var(--red-deep), var(--red) 40%, var(--blue-light) 70%, var(--blue));
+        background: linear-gradient(90deg, var(--closed), #aaa 40%, var(--blue-light) 70%, var(--blue));
     }
 
-    /* Tagline */
-    .tagline { font-size: clamp(12px, 1.7vw, 14px); font-weight: 400; color: var(--text-2); line-height: 1.8; max-width: 400px; margin: 0 auto 26px; opacity: 0; transform: translateY(16px); }
-    .tagline strong { color: var(--red); font-weight: 700; }
-
-    /* ─── COUNTDOWN ─── */
-    .countdown { display: flex; gap: 8px; align-items: center; justify-content: center; margin-bottom: 20px; opacity: 0; transform: translateY(16px); flex-wrap: nowrap; }
-    .cd-unit { display: flex; flex-direction: column; align-items: center; }
-    .cd-box {
-        background: var(--bg); border: 1.5px solid #eaecf0; border-radius: 14px;
-        padding: clamp(10px,1.8vw,16px) clamp(14px,2.5vw,22px) clamp(8px,1.4vw,12px);
-        min-width: clamp(58px,9vw,74px); position: relative; overflow: hidden;
-        box-shadow: 0 2px 14px rgba(0,0,0,0.05);
-        transition: border-color 0.3s, transform 0.2s;
+    /* ─── CLOSED CARD ─── */
+    .closed-card {
+        background: linear-gradient(135deg, #fafafa 0%, #f4f4f7 100%);
+        border: 1.5px solid #e2e2ea;
+        border-radius: 20px;
+        padding: clamp(18px, 3vw, 28px) clamp(20px, 4vw, 36px);
+        margin-bottom: 22px; opacity: 0; transform: translateY(16px);
+        max-width: 460px; width: 100%;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        position: relative; overflow: hidden;
     }
-    .cd-box::before { content: ''; position: absolute; top: 0; left: 15%; right: 15%; height: 2px; background: linear-gradient(90deg, transparent, rgba(232,0,30,0.35), transparent); }
-    .cd-box:hover { border-color: rgba(232,0,30,0.3); transform: translateY(-2px); }
-    .cd-num { font-size: clamp(22px, 4vw, 38px); font-weight: 900; color: var(--text-1); line-height: 1; letter-spacing: -0.02em; display: block; text-align: center; }
-    .cd-lbl { font-size: clamp(7px,1.1vw,8.5px); font-weight: 700; color: var(--text-3); letter-spacing: 0.14em; text-transform: uppercase; margin-top: 6px; }
-    .cd-sep { font-size: clamp(20px,3.5vw,28px); font-weight: 900; color: var(--red); opacity: 0.4; align-self: flex-start; margin-top: 12px; animation: sep 1.2s ease infinite; }
-    @keyframes sep { 0%,100%{opacity:0.4} 50%{opacity:0.1} }
+    .closed-card::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: repeating-linear-gradient(90deg, var(--closed) 0px, var(--closed) 12px, transparent 12px, transparent 18px);
+        opacity: 0.5;
+    }
+    .closed-card-icon {
+        font-size: 32px; margin-bottom: 10px; display: block; line-height: 1;
+        filter: grayscale(20%);
+    }
+    .closed-card-title {
+        font-size: clamp(15px, 2.5vw, 18px); font-weight: 900;
+        letter-spacing: -0.02em; color: var(--text-1);
+        margin-bottom: 8px;
+    }
+    .closed-card-title span { color: var(--closed); }
+    .closed-card-desc {
+        font-size: clamp(11px, 1.6vw, 12.5px); font-weight: 500;
+        color: var(--text-2); line-height: 1.75; margin-bottom: 14px;
+    }
+    .closed-card-desc strong { color: var(--text-1); font-weight: 700; }
+
+    /* Divider */
+    .closed-divider {
+        width: 100%; height: 1px; background: #e2e2ea; margin: 14px 0;
+    }
+
+    /* Info rows */
+    .info-row {
+        display: flex; align-items: flex-start; gap: 10px;
+        text-align: left; padding: 8px 0;
+    }
+    .info-row + .info-row { border-top: 1px solid #ebebf0; }
+    .info-icon {
+        width: 30px; height: 30px; border-radius: 8px;
+        background: #ebebf0; display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; font-size: 13px;
+    }
+    .info-text { flex: 1; }
+    .info-label { font-size: 8.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); margin-bottom: 2px; }
+    .info-value { font-size: 11.5px; font-weight: 700; color: var(--text-1); }
 
     /* Buttons */
-    .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 26px; opacity: 0; transform: translateY(14px); }
-    .btn-red {
+    .btn-row {
+        display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+        margin-bottom: 20px; opacity: 0; transform: translateY(14px);
+    }
+    .btn-primary {
         display: inline-flex; align-items: center; gap: 8px;
-        font-family: var(--font); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+        font-family: var(--font); font-size: 10px; font-weight: 700;
+        letter-spacing: 0.12em; text-transform: uppercase;
         color: #fff; text-decoration: none;
         background: var(--red); padding: 13px 26px; border-radius: 12px; border: none; cursor: pointer;
-        box-shadow: 0 6px 24px rgba(232,0,30,0.3); transition: all 0.25s;
+        box-shadow: 0 6px 24px rgba(232,0,30,0.28); transition: all 0.25s;
     }
-    .btn-red:hover { background: var(--red-deep); transform: translateY(-2px); box-shadow: 0 10px 32px rgba(232,0,30,0.4); }
-    .btn-blue {
+    .btn-primary:hover { background: var(--red-deep); transform: translateY(-2px); box-shadow: 0 10px 32px rgba(232,0,30,0.38); }
+    .btn-outline {
         display: inline-flex; align-items: center; gap: 8px;
-        font-family: var(--font); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-        color: var(--blue); text-decoration: none;
+        font-family: var(--font); font-size: 10px; font-weight: 700;
+        letter-spacing: 0.1em; text-transform: uppercase;
+        color: var(--text-2); text-decoration: none;
         background: var(--bg); padding: 13px 24px; border-radius: 12px;
-        border: 1.5px solid rgba(0,63,181,0.28); cursor: pointer;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.22s;
+        border: 1.5px solid #d8d8e2; cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.04); transition: all 0.22s;
     }
-    .btn-blue:hover { background: rgba(0,63,181,0.06); transform: translateY(-1px); }
+    .btn-outline:hover { background: #f4f4f8; transform: translateY(-1px); border-color: #c2c2cc; }
 
     /* Stats */
     .stats {
@@ -236,11 +285,10 @@
         box-shadow: 0 2px 16px rgba(0,0,0,0.05); overflow: hidden;
         flex-wrap: wrap; justify-content: center; max-width: 420px; width: 100%;
     }
-    .stat { padding: clamp(12px,1.8vw,16px) clamp(16px,3vw,30px); text-align: center; position: relative; flex: 1 0 auto; }
+    .stat { padding: clamp(10px,1.8vw,14px) clamp(14px,2.5vw,26px); text-align: center; position: relative; flex: 1 0 auto; }
     .stat + .stat::before { content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 1px; background: #eaecf0; }
-    .stat-val { display: block; font-size: clamp(15px,2.5vw,19px); font-weight: 900; color: var(--red); line-height: 1; }
-    .stat-val.blue { color: var(--blue); }
-    .stat-lbl { display: block; font-size: 8px; font-weight: 700; color: var(--text-3); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 5px; }
+    .stat-val { display: block; font-size: clamp(13px,2vw,17px); font-weight: 900; color: var(--text-2); line-height: 1; }
+    .stat-lbl { display: block; font-size: 7.5px; font-weight: 700; color: var(--text-3); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 5px; }
 
     /* ─── MARQUEE ─── */
     #marquee-bar {
@@ -253,7 +301,7 @@
     .marquee-track { display: flex; white-space: nowrap; width: max-content; }
     .m-item { display: inline-flex; align-items: center; gap: 9px; font-size: 8.5px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-3); padding: 0 20px; }
     .m-dot { width: 3px; height: 3px; border-radius: 50%; flex-shrink: 0; }
-    .m-dot.r { background: var(--red); }
+    .m-dot.r { background: var(--closed); }
     .m-dot.b { background: var(--blue); }
 
     /* ─── RESPONSIVE ─── */
@@ -267,7 +315,7 @@
     }
     @media (max-height: 600px) {
         #content { justify-content: flex-start; padding-top: 46px; }
-        .tagline { display: none; }
+        .closed-card-desc { display: none; }
     }
     </style>
 </head>
@@ -280,9 +328,9 @@
             <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%"   stop-color="#E8001E" stop-opacity="1"/>
+                        <stop offset="0%"   stop-color="#6b6b7b" stop-opacity="1"/>
                         <stop offset="50%"  stop-color="#003FB5" stop-opacity="1"/>
-                        <stop offset="100%" stop-color="#E8001E" stop-opacity="0"/>
+                        <stop offset="100%" stop-color="#6b6b7b" stop-opacity="0"/>
                     </linearGradient>
                 </defs>
                 <circle cx="60" cy="60" r="55" stroke="url(#rg)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="200 145"/>
@@ -318,37 +366,55 @@
     <div id="scroll">
         <div id="content">
 
-            <div class="eyebrow" id="eyebrow">
-                <div class="eyebrow-dot-wrap"><div class="eyebrow-dot"></div></div>
-                <span class="eyebrow-text">Segera Hadir</span>
+            <!-- CLOSED BADGE -->
+            <div class="closed-badge" id="closedbadge">
+                <div class="closed-icon-wrap"><span class="closed-icon">🔒</span></div>
+                <span class="closed-badge-text">Pendaftaran Ditutup</span>
             </div>
 
             <img src="https://res.cloudinary.com/djs5pi7ev/image/upload/q_auto/f_auto/v1775466723/LOGO_BR2026_vbixvo.png" alt="Bayan Run 2026" class="cs-logo" id="cslogo">
 
-            <span class="headline" id="headline">COMING<br><em>SOON</em></span>
+            <span class="headline" id="headline">PACER<br>CLOSED</span>
 
             <div id="accent-line"></div>
 
-            <p class="tagline" id="tagline">
-                Pendaftaran Pacer <strong>Bayan Run 2026</strong><br>
-                Keep Moving, Keep Strong<br>
-                Pantau terus IG <strong>@bayan_open</strong> untuk informasi pendaftaran
-            </p>
+            <!-- CLOSED CARD -->
+            <div class="closed-card" id="closedcard">
+                <span class="closed-card-icon">🏃‍♂️</span>
+                <div class="closed-card-title">Pendaftaran Pacer <span>Telah Ditutup</span></div>
+                <p class="closed-card-desc">
+                    Terima kasih atas antusias dan minat Anda menjadi Pacer di <strong>Bayan Run 2026</strong>.<br>
+                    Periode pendaftaran Pacer telah resmi ditutup. Pantau terus Instagram kami
+                    untuk informasi event dan pengumuman selanjutnya.
+                </p>
 
-            <div class="countdown" id="countdown">
-                <div class="cd-unit"><div class="cd-box"><span class="cd-num" id="cd-d">--</span></div><span class="cd-lbl">Hari</span></div>
-                <span class="cd-sep">:</span>
-                <div class="cd-unit"><div class="cd-box"><span class="cd-num" id="cd-h">--</span></div><span class="cd-lbl">Jam</span></div>
-                <span class="cd-sep">:</span>
-                <div class="cd-unit"><div class="cd-box"><span class="cd-num" id="cd-m">--</span></div><span class="cd-lbl">Menit</span></div>
-                <span class="cd-sep">:</span>
-                <div class="cd-unit"><div class="cd-box"><span class="cd-num" id="cd-s">--</span></div><span class="cd-lbl">Detik</span></div>
+                <div class="closed-divider"></div>
+
+                <div class="info-row">
+                    <div class="info-icon">📅</div>
+                    <div class="info-text">
+                        <div class="info-label">Status Pendaftaran</div>
+                        <div class="info-value">Ditutup — Slot Pacer Sudah Penuh</div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon">📍</div>
+                    <div class="info-text">
+                        <div class="info-label">Lokasi Event</div>
+                        <div class="info-value">Balikpapan, Kalimantan Timur</div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon">📣</div>
+                    <div class="info-text">
+                        <div class="info-label">Info Selanjutnya</div>
+                        <div class="info-value">Follow @bayan_open di Instagram</div>
+                    </div>
+                </div>
             </div>
 
-
-
             <div class="btn-row" id="btnrow">
-                <a href="https://www.instagram.com/bayan_open/" target="_blank" class="btn-red">
+                <a href="https://www.instagram.com/bayan_open/" target="_blank" class="btn-primary">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>
                     Follow Instagram
                 </a>
@@ -357,8 +423,8 @@
             <div class="stats" id="stats">
                 <div class="stat"><span class="stat-val">21K</span><span class="stat-lbl">Half Marathon</span></div>
                 <div class="stat"><span class="stat-val">10K</span><span class="stat-lbl">Fun Run</span></div>
-                <div class="stat"><span class="stat-val blue">5K</span><span class="stat-lbl">Fun Run</span></div>
-                <div class="stat"><span class="stat-val blue">2.5K</span><span class="stat-lbl">Kid Dash</span></div>
+                <div class="stat"><span class="stat-val">5K</span><span class="stat-lbl">Fun Run</span></div>
+                <div class="stat"><span class="stat-val">2.5K</span><span class="stat-lbl">Kid Dash</span></div>
             </div>
 
         </div>
@@ -367,22 +433,22 @@
     <!-- MARQUEE -->
     <div id="marquee-bar">
         <div class="marquee-track" id="mtrack">
-            <span class="m-item"><span class="m-dot r"></span>Bayan Run 2026</span>
-            <span class="m-item"><span class="m-dot b"></span>Balikpapan</span>
-            <span class="m-item"><span class="m-dot r"></span>Kalimantan Timur</span>
-            <span class="m-item"><span class="m-dot b"></span>Pacer</span>
-            <span class="m-item"><span class="m-dot r"></span>Keep Moving</span>
-            <span class="m-item"><span class="m-dot b"></span>Keep Strong</span>
-            <span class="m-item"><span class="m-dot r"></span>Running Event</span>
-            <span class="m-item"><span class="m-dot b"></span>Segera Hadir</span>
-            <span class="m-item"><span class="m-dot r"></span>Bayan Run 2026</span>
-            <span class="m-item"><span class="m-dot b"></span>Balikpapan</span>
-            <span class="m-item"><span class="m-dot r"></span>Kalimantan Timur</span>
-            <span class="m-item"><span class="m-dot b"></span>Pacer</span>
-            <span class="m-item"><span class="m-dot r"></span>Keep Moving</span>
-            <span class="m-item"><span class="m-dot b"></span>Keep Strong</span>
-            <span class="m-item"><span class="m-dot r"></span>Running Event</span>
-            <span class="m-item"><span class="m-dot b"></span>Segera Hadir</span>
+            <span class="m-item"><span class="m-dot r"></span>Pendaftaran Ditutup</span>
+            <span class="m-item"><span class="m-dot b"></span>Bayan Run 2026</span>
+            <span class="m-item"><span class="m-dot r"></span>Balikpapan</span>
+            <span class="m-item"><span class="m-dot b"></span>Kalimantan Timur</span>
+            <span class="m-item"><span class="m-dot r"></span>Slot Pacer Penuh</span>
+            <span class="m-item"><span class="m-dot b"></span>Keep Moving</span>
+            <span class="m-item"><span class="m-dot r"></span>Keep Strong</span>
+            <span class="m-item"><span class="m-dot b"></span>Running Event</span>
+            <span class="m-item"><span class="m-dot r"></span>Pendaftaran Ditutup</span>
+            <span class="m-item"><span class="m-dot b"></span>Bayan Run 2026</span>
+            <span class="m-item"><span class="m-dot r"></span>Balikpapan</span>
+            <span class="m-item"><span class="m-dot b"></span>Kalimantan Timur</span>
+            <span class="m-item"><span class="m-dot r"></span>Slot Pacer Penuh</span>
+            <span class="m-item"><span class="m-dot b"></span>Keep Moving</span>
+            <span class="m-item"><span class="m-dot r"></span>Keep Strong</span>
+            <span class="m-item"><span class="m-dot b"></span>Running Event</span>
         </div>
     </div>
 
@@ -390,33 +456,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script>
-/* COUNTDOWN */
-(function(){
-    var target = new Date('2026-04-15T00:00:00+08:00');
-    function pad(n){ return String(n).padStart(2,'0'); }
-
-    function tick(){
-        var now = new Date();
-        var diff = target - now;
-
-        // 🔥 Kalau waktu habis → redirect
-        if (diff <= 0) {
-            window.location.href = "/daftar";
-            return;
-        }
-
-        diff = Math.max(0, diff);
-
-        document.getElementById('cd-d').textContent = pad(Math.floor(diff/864e5));
-        document.getElementById('cd-h').textContent = pad(Math.floor((diff%864e5)/36e5));
-        document.getElementById('cd-m').textContent = pad(Math.floor((diff%36e5)/6e4));
-        document.getElementById('cd-s').textContent = pad(Math.floor((diff%6e4)/1e3));
-    }
-
-    tick();
-    setInterval(tick, 1000);
-})();
-
 /* LOADER + REVEAL */
 (function(){
     var loader = document.getElementById('loader');
@@ -452,21 +491,18 @@
         page.style.visibility = 'visible';
 
         gsap.timeline()
-            .to('#bgdots',        {opacity:1, duration:0.8}, 0)
-            .to('#top-stripe',    {opacity:1, scaleX:1, duration:1.1, ease:'power3.out'}, 0.05)
+            .to('#bgdots',          {opacity:1, duration:0.8}, 0)
+            .to('#top-stripe',      {opacity:1, scaleX:1, duration:1.1, ease:'power3.out'}, 0.05)
             .to(['#corner-logo','#edition-tag'], {opacity:1, stagger:0.1, duration:0.5, ease:'power2.out'}, 0.3)
-            .to('#flagmini',      {opacity:1, y:0, duration:0.55, ease:'power3.out'}, 0.38)
-            .to('#eyebrow',       {opacity:1, y:0, duration:0.6, ease:'power3.out'}, 0.46)
-            .to('#cslogo',        {opacity:1, scale:1, y:0, duration:0.8, ease:'back.out(1.5)'}, 0.58)
-            .to('#headline',      {opacity:1, y:0, duration:0.75, ease:'power3.out'}, 0.72)
-            .to('#accent-line',   {width:'140px', duration:0.9, ease:'power2.out'}, 0.9)
-            .to('#tagline',       {opacity:1, y:0, duration:0.6, ease:'power2.out'}, 0.98)
-            .to('#countdown',     {opacity:1, y:0, duration:0.6, ease:'power2.out'}, 1.08)
-            .to('#btnrow',        {opacity:1, y:0, duration:0.55, ease:'power2.out'}, 1.2)
-            .to('#stats',         {opacity:1, y:0, duration:0.5, ease:'power2.out'}, 1.44)
-            .to('#socials',       {opacity:1, duration:0.45, ease:'power2.out'}, 1.5)
-            .to('#marquee-bar',   {opacity:1, duration:0.65, ease:'power2.out'}, 1.55)
-            .to('.cd-num',        {scale:1.1, color:'#E8001E', stagger:0.06, duration:0.22, yoyo:true, repeat:1, ease:'power2.inOut'}, 1.1);
+            .to('#closedbadge',     {opacity:1, y:0, duration:0.6, ease:'power3.out'}, 0.46)
+            .to('#cslogo',          {opacity:1, scale:1, y:0, duration:0.8, ease:'back.out(1.5)'}, 0.58)
+            .to('#headline',        {opacity:1, y:0, duration:0.75, ease:'power3.out'}, 0.72)
+            .to('#accent-line',     {width:'140px', duration:0.9, ease:'power2.out'}, 0.9)
+            .to('#closedcard',      {opacity:1, y:0, duration:0.65, ease:'power3.out'}, 1.0)
+            .to('#btnrow',          {opacity:1, y:0, duration:0.55, ease:'power2.out'}, 1.22)
+            .to('#stats',           {opacity:1, y:0, duration:0.5, ease:'power2.out'}, 1.38)
+            .to('#socials',         {opacity:1, duration:0.45, ease:'power2.out'}, 1.48)
+            .to('#marquee-bar',     {opacity:1, duration:0.65, ease:'power2.out'}, 1.52);
 
         setTimeout(startMarquee, 1800);
 

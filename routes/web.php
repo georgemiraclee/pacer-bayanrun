@@ -49,11 +49,11 @@ Route::get('/admin/debug-storage/{id}', function($id) {
     ], 200, ['Content-Type'=>'application/json'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 })->middleware(\App\Http\Middleware\AdminAuthenticate::class);
 
-Route::prefix('daftar')->name('candidate.')->group(function () {
-    Route::get('/',       [CandidateController::class, 'create'])->name('register');
-    Route::post('/',      [CandidateController::class, 'store'])->name('store');
-    Route::get('/sukses', [CandidateController::class, 'success'])->name('success');
-});
+//Route::prefix('daftar')->name('candidate.')->group(function () {
+  //  Route::get('/',       [CandidateController::class, 'create'])->name('register');
+    //Route::post('/',      [CandidateController::class, 'store'])->name('store');
+    //Route::get('/sukses', [CandidateController::class, 'success'])->name('success');
+//});
 
 // ── Admin ────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
