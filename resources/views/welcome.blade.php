@@ -381,7 +381,7 @@
             <!-- CLOSED CARD -->
             <div class="closed-card" id="closedcard">
                 <span class="closed-card-icon">🏃‍♂️</span>
-                <div class="closed-card-title">Pendaftaran Pacer <span>Telah Ditutup</span></div>
+                <div class="closed-card-title">Pendaftaran Pacer Telah Ditutup</div>
                 <p class="closed-card-desc">
                     Terima kasih atas antusias dan minat Anda menjadi Pacer di <strong>Bayan Run 2026</strong>.<br>
                     Periode pendaftaran Pacer telah resmi ditutup. Pantau terus Instagram kami
@@ -394,14 +394,14 @@
                     <div class="info-icon">📅</div>
                     <div class="info-text">
                         <div class="info-label">Status Pendaftaran</div>
-                        <div class="info-value">Ditutup — Slot Pacer Sudah Penuh</div>
+                        <div class="info-value">Ditutup, Slot Pacer Sudah Penuh</div>
                     </div>
                 </div>
                 <div class="info-row">
                     <div class="info-icon">📍</div>
                     <div class="info-text">
                         <div class="info-label">Lokasi Event</div>
-                        <div class="info-value">Balikpapan, Kalimantan Timur</div>
+                        <div class="info-value">Lapangan Merdeka 3, Balikpapan, Kalimantan Timur</div>
                     </div>
                 </div>
                 <div class="info-row">
