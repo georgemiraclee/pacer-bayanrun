@@ -45,10 +45,11 @@ class InterviewConfirmController extends Controller
         $validated = $request->validate([
             'status'       => ['required', 'in:hadir,ganti_hari'],
             'request_hari' => ['required_if:status,ganti_hari', 'nullable', 'string', 'max:100'],
-            'alasan'       => ['nullable', 'string', 'max:500'],
+            'alasan'       => ['required_if:status,ganti_hari', 'string', 'max:500'],
         ], [
-            'status.required'            => 'Pilih status konfirmasi.',
-            'request_hari.required_if'   => 'Pilih hari pengganti.',
+            'status.required'          => 'Pilih status konfirmasi.',
+            'request_hari.required_if' => 'Pilih hari pengganti.',
+            'alasan.required_if'       => 'Alasan wajib diisi jika request ganti hari.',
         ]);
 
         // Upsert — kandidat bisa ubah jawaban
