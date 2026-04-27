@@ -466,7 +466,9 @@ tbody td { padding: 10px 14px; }
                             @else
                                 <span class="badge badge-ganti">↺ Ganti: {{ $conf->request_hari }}</span>
                                 @if($conf->alasan)
-                                    <div style="font-size:11px;color:#AAAAAA;margin-top:3px;max-width:160px;">{{ Str::limit($conf->alasan, 40) }}</div>
+                                    <div style="font-size:11px;color:#888;margin-top:4px;max-width:200px;white-space:normal;line-height:1.4;font-style:italic;">
+                                        "{{ $conf->alasan }}"
+                                    </div>
                                 @endif
                             @endif
                             <div style="font-size:10px;color:#CCCCCC;margin-top:2px;">{{ $conf->created_at->format('d M, H:i') }}</div>
