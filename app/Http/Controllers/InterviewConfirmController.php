@@ -16,11 +16,23 @@ class InterviewConfirmController extends Controller
             ->firstOrFail();
 
         // Daftar hari yang tersedia untuk request ganti
-        $hariTersedia = InterviewSession::select('jadwal')
-            ->distinct()
-            ->where('jadwal', '!=', $session->jadwal)
-            ->orderBy('jadwal')
-            ->pluck('jadwal');
+    $hariTersedia = InterviewSession::select('jadwal')
+        ->distinct()
+        ->where('jadwal', '!=', $session->jadwal)
+        ->pluck('jadwal')
+        ->sortBy(function($jadwal) {
+            $months = [
+                'Januari'=>1,'Februari'=>2,'Maret'=>3,'April'=>4,
+                'Mei'=>5,'Juni'=>6,'Juli'=>7,'Agustus'=>8,
+                'September'=>9,'Oktober'=>10,'November'=>11,'Desember'=>12,
+            ];
+            // Handle "Senin, 4 Mei 2026" dan "4 Mei 2026"
+            $clean = preg_replace('/^[^,]+,\s*/', '', $jadwal); // hapus "Senin, "
+            $parts = explode(' ', trim($clean));                 // ["4","Mei","2026"]
+            if (count($parts) < 3) return 0;
+            return mktime(0,0,0, $months[$parts[1]] ?? 0, (int)$parts[0], (int)$parts[2]);
+        })
+        ->values();
 
         return view('interview.confirm', compact('session', 'hariTersedia'));
     }
