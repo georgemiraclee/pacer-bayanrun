@@ -31,7 +31,7 @@
             @foreach([
                 ['Verifikasi Data', 'Tim panitia akan memverifikasi data dan dokumen yang Anda upload.'],
                 ['Proses Review', 'Proses verifikasi dan memproses data kandidat setelah pendaftaran ditutup'],
-                ['Pengumuman', 'Hasil seleksi akan diinformasikan melalui akun instagram @bayan_opem.'],
+                ['Pengumuman', 'Hasil seleksi akan diinformasikan melalui akun instagram @bayan_open.'],
             ] as $i => [$title, $desc])
             <div style="display:flex; gap:14px; align-items:flex-start;">
                 <div style="width:28px; height:28px; background:#E8001E; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">
@@ -49,16 +49,16 @@
     {{-- Contact --}}
     <p style="font-size:12px; color:#BBB; margin-top:28px; animation:fadeUp .5s ease .45s both;">
         Pertanyaan? DM Instagram resmi kami
-        <a href="https://instagram.com/bayan_opem" style="color:#E8001E; text-decoration:none; font-weight:500;">@bayan_opem</a>
+        <a href="https://instagram.com/bayan_open" style="color:#E8001E; text-decoration:none; font-weight:500;">@bayan_open</a>
     </p>
 
-    <a href="{{ route('candidate.register') }}"
+     <!--<a href="{{ route('candidate.register') }}"
        style="display:inline-flex; align-items:center; gap:6px; margin-top:20px; font-size:12px; font-family:'Syne',sans-serif; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#999; text-decoration:none; transition:color .2s; animation:fadeUp .5s ease .5s both;">
         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
         Kembali ke Halaman Pendaftaran
-    </a>
+    </a>-->
 
 </div>
 @endsection
