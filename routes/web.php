@@ -4,22 +4,28 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\KtpOcrController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\InterviewController as AdminInterviewController;
+use App\Http\Controllers\InterviewConfirmController;
 use App\Http\Middleware\AdminAuthenticate;
 
 // ── Public ──────────────────────────────────────────────────
-// Route::get('/', fn() => redirect()->route('candidate.register'));
-
 Route::get('/', function () {
     return view('welcome');
+});
+
+// ── PUBLIC: Halaman konfirmasi interview untuk kandidat ──────
+Route::prefix('interview')->name('interview.')->group(function () {
+    Route::get('/confirm/{token}',  [InterviewConfirmController::class, 'show'])->name('confirm');
+    Route::post('/confirm/{token}', [InterviewConfirmController::class, 'store'])->name('confirm.store');
 });
 
 // ── OCR KTP (AJAX endpoint) ──────────────────────────────────
 Route::post('/ocr/ktp', [KtpOcrController::class, 'scan'])->name('ocr.ktp');
 
 // ── DIAGNOSTIC: cek storage (hapus setelah production) ───────
-Route::get('/admin/debug-storage/{id}', function($id) {
+Route::get('/admin/debug-storage/{id}', function ($id) {
     if (!app()->isLocal()) abort(403);
-    $c = \App\Models\Candidate::findOrFail($id);
+    $c      = \App\Models\Candidate::findOrFail($id);
     $checks = [];
     $fields = [
         'ktp_file', 'fm_certificate', 'hm_certificate',
@@ -39,18 +45,19 @@ Route::get('/admin/debug-storage/{id}', function($id) {
             'disk_exists' => $diskExists ? 'YA ✓' : 'TIDAK ✗',
             'file_exists' => $fileExists ? 'YA ✓' : 'TIDAK ✗',
             'abs_path'    => $absPath,
-            'size'        => $fileExists ? round(filesize($absPath)/1024,1).'KB' : '—',
+            'size'        => $fileExists ? round(filesize($absPath) / 1024, 1) . 'KB' : '—',
         ];
     }
     return response()->json([
         'kandidat'     => $c->nama,
         'storage_root' => storage_path('app/private'),
         'checks'       => $checks,
-    ], 200, ['Content-Type'=>'application/json'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-})->middleware(\App\Http\Middleware\AdminAuthenticate::class);
+    ], 200, ['Content-Type' => 'application/json'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+})->middleware(AdminAuthenticate::class);
 
+// ── Pendaftaran Kandidat ─────────────────────────────────────
 Route::prefix('daftar')->name('candidate.')->group(function () {
-   Route::get('/',       [CandidateController::class, 'create'])->name('register');
+    Route::get('/',       [CandidateController::class, 'create'])->name('register');
     Route::post('/',      [CandidateController::class, 'store'])->name('store');
     Route::get('/sukses', [CandidateController::class, 'success'])->name('success');
 });
@@ -65,12 +72,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
         Route::get('/export',    [AdminController::class, 'exportCsv'])->name('export');
 
+        // ── Kandidat Pacer ─────────────────────────────────────
         Route::prefix('kandidat/{candidate}')->name('candidate.')->group(function () {
-            Route::get('/',        [AdminController::class, 'show'])->name('show');
-            Route::post('/status', [AdminController::class, 'updateStatus'])->name('status');
+            Route::get('/',         [AdminController::class, 'show'])->name('show');
+            Route::post('/status',  [AdminController::class, 'updateStatus'])->name('status');
             Route::post('/seleksi', [AdminController::class, 'updateHasilSeleksi'])->name('seleksi');
 
-            // Preview inline (buka di browser tab baru)
             Route::get('/preview/ktp',         [AdminController::class, 'previewKtp'])->name('preview.ktp');
             Route::get('/preview/fm-cert',     [AdminController::class, 'previewFmCert'])->name('preview.fm');
             Route::get('/preview/hm-cert',     [AdminController::class, 'previewHmCert'])->name('preview.hm');
@@ -86,6 +93,22 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/preview/bt-10k',      [AdminController::class, 'previewBt10k'])->name('preview.bt.10k');
             Route::get('/preview/bt-5k',       [AdminController::class, 'previewBt5k'])->name('preview.bt.5k');
             Route::get('/preview/waiver',      [AdminController::class, 'previewWaiver'])->name('preview.waiver');
+        });
+
+        // ── Interview Broadcast ─────────────────────────────────
+        Route::prefix('interview')->name('interview.')->group(function () {
+            Route::get('/',                        [AdminInterviewController::class, 'index'])->name('index');
+            Route::post('/import',                 [AdminInterviewController::class, 'import'])->name('import');
+            Route::post('/reset',                  [AdminInterviewController::class, 'reset'])->name('reset');
+            Route::get('/export',                  [AdminInterviewController::class, 'exportCsv'])->name('export');
+            Route::post('/store-manual',           [AdminInterviewController::class, 'storeManual'])->name('store-manual');
+            Route::post('/blast-batch',  [AdminInterviewController::class, 'blastBatch'])->name('blast-batch');
+            Route::post('/blast-single/{session}', [AdminInterviewController::class, 'blastSingle'])->name('blast-single');
+            Route::post('/wa-sent-batch',          [AdminInterviewController::class, 'markWaSentBatch'])->name('wa-sent-batch');
+
+            // ⚠ PENTING: batch HARUS di atas {session} agar tidak terbaca sebagai ID
+            Route::delete('/batch',      [AdminInterviewController::class, 'destroyBatch'])->name('destroy-batch');
+            Route::delete('/{session}',  [AdminInterviewController::class, 'destroy'])->name('destroy');
         });
     });
 });

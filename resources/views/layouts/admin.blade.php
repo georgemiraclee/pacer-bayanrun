@@ -330,14 +330,14 @@
             Export CSV
         </a>
 
-        <!--<a href="{{ route('candidate.register') }}" target="_blank"
-           class="nav-link">
+        <a href="{{ route('admin.interview.index') }}"
+        class="nav-link {{ request()->routeIs('admin.interview.*') ? 'active' : '' }}">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
             </svg>
-            Lihat Form Publik
-        </a>-->
+            Broadcast Interview
+        </a>
     </nav>
 
     <div class="sidebar-footer">
