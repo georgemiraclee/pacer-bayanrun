@@ -346,8 +346,8 @@ input[type=radio].hidden-radio { position:absolute; opacity:0; width:0; height:0
                        value="{{ old('request_hari', $session->confirmation?->request_hari) }}">
                 @error('request_hari')<span class="err-msg">{{ $message }}</span>@enderror
 
-                <textarea name="alasan" class="alasan-inp" rows="3"
-                          placeholder="Alasan tidak bisa hadir di jadwal awal... (opsional)">{{ old('alasan', $session->confirmation?->alasan) }}</textarea>
+           <textarea name="alasan" class="alasan-inp" rows="3"
+          placeholder="Tuliskan alasan tidak bisa hadir di jadwal ini...">{{ old('alasan', $session->confirmation?->alasan) }}</textarea>
                 @error('alasan')<span class="err-msg">{{ $message }}</span>@enderror
             </div>
 
