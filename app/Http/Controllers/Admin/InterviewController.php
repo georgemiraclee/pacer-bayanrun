@@ -64,26 +64,21 @@ class InterviewController extends Controller
     // ── Tambah Manual ─────────────────────────────────────────────
     public function storeManual(Request $request)
     {
-    $validated = $request->validate([
-        'nama'  => ['required', 'string', 'max:200'],
-        'no_wa' => ['required', 'string', 'max:20'],
-        'email' => ['nullable', 'email', 'max:200'],
-        'jadwal'=> ['required', 'date'],
-        'waktu' => ['required', 'string', 'max:10'],
-        'durasi'=> ['required', 'string'],
-    ]);
+        $validated = $request->validate([
+            'nama'  => ['required', 'string', 'max:200'],
+            'no_wa' => ['required', 'string', 'max:20'],
+            'email' => ['nullable', 'email', 'max:200'],
+            'jadwal'=> ['required', 'date'],
+            'waktu' => ['required', 'string', 'max:10'],
+            'durasi'=> ['required', 'string'],
+        ]);
 
-    // Format tanggal → "Senin, 5 Mei 2026"
-    $days   = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-    $months = ['','Januari','Februari','Maret','April','Mei','Juni',
-            'Juli','Agustus','September','Oktober','November','Desember'];
-    $ts     = strtotime($validated['jadwal']);
-    $jadwal = $days[date('w',$ts)].', '.date('j',$ts).' '.$months[(int)date('n',$ts)].' '.date('Y',$ts);
-
-        // Pakai jadwal custom kalau dipilih
-        $jadwal = $validated['jadwal'] === '__custom__'
-            ? trim($validated['jadwal_custom'] ?? '')
-            : $validated['jadwal'];
+        // Format tanggal → "Senin, 5 Mei 2026"
+        $days   = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+        $months = ['','Januari','Februari','Maret','April','Mei','Juni',
+                'Juli','Agustus','September','Oktober','November','Desember'];
+        $ts     = strtotime($validated['jadwal']);
+        $jadwal = $days[date('w',$ts)].', '.date('j',$ts).' '.$months[(int)date('n',$ts)].' '.date('Y',$ts);
 
         if (empty($jadwal)) {
             return back()->with('error', 'Jadwal tidak boleh kosong.');
@@ -174,7 +169,6 @@ class InterviewController extends Controller
         $nama = $session->nama;
 
         DB::transaction(function () use ($session) {
-            // Hapus konfirmasi dulu (jika tidak pakai cascade di migration)
             $session->confirmation()?->delete();
             $session->delete();
         });
@@ -197,7 +191,6 @@ class InterviewController extends Controller
         $count = 0;
 
         DB::transaction(function () use ($ids, &$count) {
-            // Hapus konfirmasi terkait terlebih dahulu
             InterviewConfirmation::whereIn('interview_session_id', $ids)->delete();
             $count = InterviewSession::whereIn('id', $ids)->delete();
         });

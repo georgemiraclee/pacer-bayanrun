@@ -225,8 +225,8 @@ input[type=radio].hidden-radio { position:absolute; opacity:0; width:0; height:0
             <div style="margin-top:20px;padding-top:16px;border-top:1px solid #F0F0F0;">
                 <p style="font-size:11px;color:#AAAAAA;line-height:1.7;">
                     Pertanyaan? DM Instagram resmi<br>
-                    <a href="https://instagram.com/bayan_opem" target="_blank"
-                       style="color:#E8001E;font-weight:700;text-decoration:none;">@bayan_opem</a>
+                    <a href="https://instagram.com/bayan_open" target="_blank"
+                       style="color:#E8001E;font-weight:700;text-decoration:none;">@bayan_open</a>
                 </p>
             </div>
         </div>
@@ -362,8 +362,8 @@ input[type=radio].hidden-radio { position:absolute; opacity:0; width:0; height:0
 
         <p style="font-size:11px;color:#CCCCCC;margin-top:16px;text-align:center;line-height:1.7;">
             Pertanyaan? DM
-            <a href="https://instagram.com/bayan_opem" target="_blank"
-               style="color:#E8001E;font-weight:600;text-decoration:none;">@bayan_opem</a>
+            <a href="https://instagram.com/bayan_open" target="_blank"
+               style="color:#E8001E;font-weight:600;text-decoration:none;">@bayan_open</a>
         </p>
         @endif
 
