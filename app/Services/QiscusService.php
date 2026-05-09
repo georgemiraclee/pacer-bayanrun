@@ -66,6 +66,40 @@ class QiscusService
         return $this->post($payload);
     }
 
+    public function sendTidakLolosNotification(
+        string $phoneNumber,
+        string $nama
+        ): array {
+            $phone = $this->normalizePhone($phoneNumber);
+
+            return $this->sendTemplate(
+                phone:        $phone,
+                templateName: 'pacer_tidak_lolos',
+                language:     config('qiscus.template_language', 'id'),
+                bodyParams: [
+                    ['type' => 'text', 'text' => $nama],
+                ]
+            );
+        }
+
+
+    public function sendDokumenDitolakNotification(
+        string $phoneNumber,
+        string $nama,
+        string $catatan = ''
+        ): array {
+            $phone = $this->normalizePhone($phoneNumber);
+
+            return $this->sendTemplate(
+                phone:        $phone,
+                templateName: 'pacer_tidak_lolos', // sesuaikan nama template di Qiscus
+                language:     config('qiscus.template_language', 'id'),
+                bodyParams: [
+                    ['type' => 'text', 'text' => $nama],
+                ]
+            );
+        }
+
     public function sendTemplate(
         string $phone,
         string $templateName,

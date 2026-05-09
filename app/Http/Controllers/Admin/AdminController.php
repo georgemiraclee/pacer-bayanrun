@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Services\QiscusService;
 
 class AdminController extends Controller
 {
@@ -156,9 +157,9 @@ class AdminController extends Controller
 
     // ── UPDATE HASIL SELEKSI PACER ────────────────────────────
 
-    public function updateHasilSeleksi(Request $request, Candidate $candidate)
+
+    public function updateHasilSeleksi(Request $request, Candidate $candidate, QiscusService $qiscus)
     {
-        // Hanya boleh dilakukan jika sudah verified
         if (!$candidate->isVerified()) {
             return back()->with('error', 'Seleksi akhir hanya bisa dilakukan pada kandidat yang sudah terverifikasi.');
         }
@@ -168,7 +169,6 @@ class AdminController extends Controller
             'catatan_seleksi' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        // Reset seleksi
         if ($request->hasil_seleksi === 'reset') {
             $candidate->update([
                 'hasil_seleksi'   => null,
@@ -184,12 +184,52 @@ class AdminController extends Controller
             'seleksi_at'      => now(),
         ]);
 
+        // ── Blast WA jika tidak lolos ──
+        if ($request->hasil_seleksi === 'tidak_lolos' && !empty($candidate->no_hp)) {
+            $result = $qiscus->sendTidakLolosNotification(
+                phoneNumber: $candidate->no_hp,
+                nama:        $candidate->nama,
+            );
+
+            if (!$result['success']) {
+                Log::warning('[Seleksi] Gagal kirim WA tidak lolos', [
+                    'candidate_id' => $candidate->id,
+                    'error'        => $result['error'] ?? 'Unknown',
+                ]);
+            }
+        }
+
         $label = $request->hasil_seleksi === 'lolos'
             ? 'Lolos Seleksi Pacer'
             : 'Tidak Lolos Seleksi';
 
         return back()->with('success', "Kandidat {$candidate->nama}: {$label}.");
     }
+
+    public function blastTolak(Candidate $candidate, QiscusService $qiscus)
+        {
+            if (!$candidate->isRejected()) {
+                return back()->with('error', 'Kandidat belum berstatus ditolak.');
+            }
+
+            if (empty($candidate->no_hp)) {
+                return back()->with('error', 'Nomor WhatsApp kandidat tidak tersedia.');
+            }
+
+            $result = $qiscus->sendDokumenDitolakNotification(
+                phoneNumber: $candidate->no_hp,
+                nama:        $candidate->nama,
+                catatan:     $candidate->catatan_admin ?? '',
+            );
+
+            if ($result['success']) {
+                return back()->with('success', "Notifikasi penolakan berhasil dikirim ke {$candidate->nama}.");
+            }
+
+            return back()->with('error', 'Gagal kirim WA: ' . ($result['error'] ?? 'Unknown error'));
+        }
+
+        
 
     // ── FILE PREVIEW ─────────────────────────────────────────
 
