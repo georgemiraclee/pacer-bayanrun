@@ -125,6 +125,20 @@
         .nav-link.active svg { color: var(--red); }
         .nav-link svg { flex-shrink: 0; color: var(--gray-400); }
 
+        /* Badge counter di nav link */
+        .nav-badge {
+            margin-left: auto;
+            font-family: 'Syne', sans-serif;
+            font-size: 9px; font-weight: 700;
+            background: var(--red-lt); color: var(--red);
+            padding: 2px 7px; border-radius: 100px;
+            letter-spacing: .04em;
+        }
+        .nav-link.active .nav-badge {
+            background: var(--red);
+            color: #fff;
+        }
+
         .sidebar-footer {
             padding: 10px;
             border-top: 1px solid var(--gray-100);
@@ -312,6 +326,7 @@
     <nav class="sidebar-nav">
         <p class="nav-section-label">Menu</p>
 
+        {{-- Dashboard --}}
         <a href="{{ route('admin.dashboard') }}"
            class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -321,6 +336,7 @@
             Dashboard
         </a>
 
+        {{-- Export CSV --}}
         <a href="{{ route('admin.export') }}"
            class="nav-link">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -330,14 +346,38 @@
             Export CSV
         </a>
 
+        <p class="nav-section-label" style="margin-top:6px;">Broadcast</p>
+
+        {{-- Broadcast Interview --}}
         <a href="{{ route('admin.interview.index') }}"
-        class="nav-link {{ request()->routeIs('admin.interview.*') ? 'active' : '' }}">
+           class="nav-link {{ request()->routeIs('admin.interview.*') ? 'active' : '' }}">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
             </svg>
             Broadcast Interview
         </a>
+
+        {{-- Blast Balke Test --}}
+        <a href="{{ route('admin.balke.index') }}"
+           class="nav-link {{ request()->routeIs('admin.balke.*') ? 'active' : '' }}">
+            {{-- Icon: stopwatch / running test --}}
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Blast Balke Test
+            @php
+                $balkeBelum = \App\Models\BalkeCandidate::where('balke_wa_sent', false)
+                    ->whereNotNull('no_wa')
+                    ->where('no_wa', '!=', '')
+                    ->count();
+            @endphp
+            @if($balkeBelum > 0)
+                <span class="nav-badge">{{ $balkeBelum }}</span>
+            @endif
+        </a>
+
     </nav>
 
     <div class="sidebar-footer">
@@ -418,19 +458,16 @@
     toggle.addEventListener('click', toggleSidebar);
     overlay.addEventListener('click', closeSidebar);
 
-    // Tutup otomatis saat klik nav link di mobile
     sidebar.querySelectorAll('a.nav-link').forEach(function (link) {
         link.addEventListener('click', function () {
             if (window.innerWidth <= 768) closeSidebar();
         });
     });
 
-    // Tutup saat tekan Escape
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeSidebar();
     });
 
-    // Reset state saat resize ke desktop
     window.addEventListener('resize', function () {
         if (window.innerWidth > 768) closeSidebar();
     });
