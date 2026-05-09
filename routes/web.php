@@ -66,7 +66,7 @@ Route::prefix('daftar')->name('candidate.')->group(function () {
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login',  [AdminController::class, 'loginForm'])->name('login');
     Route::post('/login', [AdminController::class, 'login'])->name('login.post');
-    
+
     Route::middleware(AdminAuthenticate::class)->group(function () {
         Route::post('/logout',   [AdminController::class, 'logout'])->name('logout');
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
@@ -77,8 +77,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/',              [AdminController::class, 'show'])->name('show');
             Route::post('/status',       [AdminController::class, 'updateStatus'])->name('status');
             Route::post('/seleksi',      [AdminController::class, 'updateHasilSeleksi'])->name('seleksi');
-            Route::post('/blast-tolak',  [AdminController::class, 'blastTolak'])->name('blast.tolak'); // ← tambah ini
-
+            Route::post('/blast-tolak',  [AdminController::class, 'blastTolak'])->name('blast.tolak');
 
             Route::get('/preview/ktp',         [AdminController::class, 'previewKtp'])->name('preview.ktp');
             Route::get('/preview/fm-cert',     [AdminController::class, 'previewFmCert'])->name('preview.fm');
@@ -97,6 +96,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/preview/waiver',      [AdminController::class, 'previewWaiver'])->name('preview.waiver');
         });
 
+        // ── Balke Test ─────────────────────────────────────────
+        Route::prefix('balke')->name('balke.')->group(function () {
+            Route::get('/',                            [\App\Http\Controllers\Admin\BalkeController::class, 'index'])->name('index');
+            Route::get('/export',                      [\App\Http\Controllers\Admin\BalkeController::class, 'exportCsv'])->name('export');
+            Route::post('/import',                     [\App\Http\Controllers\Admin\BalkeController::class, 'import'])->name('import');
+            Route::post('/reset',                      [\App\Http\Controllers\Admin\BalkeController::class, 'reset'])->name('reset');
+            Route::post('/store-manual',               [\App\Http\Controllers\Admin\BalkeController::class, 'storeManual'])->name('store-manual');
+            Route::post('/blast-batch',                [\App\Http\Controllers\Admin\BalkeController::class, 'blastBatch'])->name('blast-batch');
+             Route::delete('/batch',      [\App\Http\Controllers\Admin\BalkeController::class, 'destroyBatch'])->name('destroy-batch');
+            Route::delete('/{candidate}', [\App\Http\Controllers\Admin\BalkeController::class, 'destroy'])->name('destroy');
+            Route::post('/blast-single/{candidate}',   [\App\Http\Controllers\Admin\BalkeController::class, 'blastSingle'])->name('blast-single');
+        });
+
         // ── Interview Broadcast ─────────────────────────────────
         Route::prefix('interview')->name('interview.')->group(function () {
             Route::get('/',                        [AdminInterviewController::class, 'index'])->name('index');
@@ -104,7 +116,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/reset',                  [AdminInterviewController::class, 'reset'])->name('reset');
             Route::get('/export',                  [AdminInterviewController::class, 'exportCsv'])->name('export');
             Route::post('/store-manual',           [AdminInterviewController::class, 'storeManual'])->name('store-manual');
-            Route::post('/blast-batch',  [AdminInterviewController::class, 'blastBatch'])->name('blast-batch');
+            Route::post('/blast-batch',            [AdminInterviewController::class, 'blastBatch'])->name('blast-batch');
             Route::post('/blast-single/{session}', [AdminInterviewController::class, 'blastSingle'])->name('blast-single');
             Route::post('/wa-sent-batch',          [AdminInterviewController::class, 'markWaSentBatch'])->name('wa-sent-batch');
 
