@@ -66,7 +66,7 @@ Route::prefix('daftar')->name('candidate.')->group(function () {
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login',  [AdminController::class, 'loginForm'])->name('login');
     Route::post('/login', [AdminController::class, 'login'])->name('login.post');
-
+    
     Route::middleware(AdminAuthenticate::class)->group(function () {
         Route::post('/logout',   [AdminController::class, 'logout'])->name('logout');
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
@@ -74,9 +74,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // ── Kandidat Pacer ─────────────────────────────────────
         Route::prefix('kandidat/{candidate}')->name('candidate.')->group(function () {
-            Route::get('/',         [AdminController::class, 'show'])->name('show');
-            Route::post('/status',  [AdminController::class, 'updateStatus'])->name('status');
-            Route::post('/seleksi', [AdminController::class, 'updateHasilSeleksi'])->name('seleksi');
+            Route::get('/',              [AdminController::class, 'show'])->name('show');
+            Route::post('/status',       [AdminController::class, 'updateStatus'])->name('status');
+            Route::post('/seleksi',      [AdminController::class, 'updateHasilSeleksi'])->name('seleksi');
+            Route::post('/blast-tolak',  [AdminController::class, 'blastTolak'])->name('blast.tolak'); // ← tambah ini
+
 
             Route::get('/preview/ktp',         [AdminController::class, 'previewKtp'])->name('preview.ktp');
             Route::get('/preview/fm-cert',     [AdminController::class, 'previewFmCert'])->name('preview.fm');
