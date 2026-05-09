@@ -229,6 +229,32 @@ class AdminController extends Controller
             return back()->with('error', 'Gagal kirim WA: ' . ($result['error'] ?? 'Unknown error'));
         }
 
+        public function blastTidakLolos(Candidate $candidate, QiscusService $qiscus)
+            {
+                if (!$candidate->isLolos() === false && $candidate->belumDiseleksi()) {
+                    return back()->with('error', 'Kandidat belum memiliki hasil seleksi tidak lolos.');
+                }
+
+                if ($candidate->hasil_seleksi !== 'tidak_lolos') {
+                    return back()->with('error', 'Kandidat tidak berstatus tidak lolos seleksi.');
+                }
+
+                if (empty($candidate->no_hp)) {
+                    return back()->with('error', 'Nomor WhatsApp kandidat tidak tersedia.');
+                }
+
+                $result = $qiscus->sendTidakLolosNotification(
+                    phoneNumber: $candidate->no_hp,
+                    nama:        $candidate->nama,
+                );
+
+                if ($result['success']) {
+                    return back()->with('success', "Notifikasi tidak lolos berhasil dikirim ke {$candidate->nama}.");
+                }
+
+                return back()->with('error', 'Gagal kirim WA: ' . ($result['error'] ?? 'Unknown error'));
+            }
+
         
 
     // ── FILE PREVIEW ─────────────────────────────────────────

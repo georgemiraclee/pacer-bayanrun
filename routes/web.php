@@ -77,7 +77,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/',              [AdminController::class, 'show'])->name('show');
             Route::post('/status',       [AdminController::class, 'updateStatus'])->name('status');
             Route::post('/seleksi',      [AdminController::class, 'updateHasilSeleksi'])->name('seleksi');
-            Route::post('/blast-tolak',  [AdminController::class, 'blastTolak'])->name('blast.tolak');
+            Route::post('/blast-tolak',      [AdminController::class, 'blastTolak'])->name('blast.tolak');
+            Route::post('/blast-tidak-lolos', [AdminController::class, 'blastTidakLolos'])->name('blast.tidak-lolos');
 
             Route::get('/preview/ktp',         [AdminController::class, 'previewKtp'])->name('preview.ktp');
             Route::get('/preview/fm-cert',     [AdminController::class, 'previewFmCert'])->name('preview.fm');
