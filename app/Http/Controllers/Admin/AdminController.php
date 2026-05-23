@@ -184,18 +184,30 @@ class AdminController extends Controller
             'seleksi_at'      => now(),
         ]);
 
-        // ── Blast WA jika tidak lolos ──
-        if ($request->hasil_seleksi === 'tidak_lolos' && !empty($candidate->no_hp)) {
-            $result = $qiscus->sendTidakLolosNotification(
-                phoneNumber: $candidate->no_hp,
-                nama:        $candidate->nama,
-            );
-
-            if (!$result['success']) {
-                Log::warning('[Seleksi] Gagal kirim WA tidak lolos', [
-                    'candidate_id' => $candidate->id,
-                    'error'        => $result['error'] ?? 'Unknown',
-                ]);
+        // ── Blast WA lolos / tidak lolos ──
+        if (!empty($candidate->no_hp)) {
+            if ($request->hasil_seleksi === 'lolos') {
+                $result = $qiscus->sendLolosNotification(
+                    phoneNumber: $candidate->no_hp,
+                    nama:        $candidate->nama,
+                );
+                if (!$result['success']) {
+                    Log::warning('[Seleksi] Gagal kirim WA lolos', [
+                        'candidate_id' => $candidate->id,
+                        'error'        => $result['error'] ?? 'Unknown',
+                    ]);
+                }
+            } elseif ($request->hasil_seleksi === 'tidak_lolos') {
+                $result = $qiscus->sendTidakLolosNotification(
+                    phoneNumber: $candidate->no_hp,
+                    nama:        $candidate->nama,
+                );
+                if (!$result['success']) {
+                    Log::warning('[Seleksi] Gagal kirim WA tidak lolos', [
+                        'candidate_id' => $candidate->id,
+                        'error'        => $result['error'] ?? 'Unknown',
+                    ]);
+                }
             }
         }
 

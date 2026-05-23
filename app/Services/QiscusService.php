@@ -66,6 +66,22 @@ class QiscusService
         return $this->post($payload);
     }
 
+    public function sendLolosNotification(
+        string $phoneNumber,
+        string $nama
+        ): array {
+            $phone = $this->normalizePhone($phoneNumber);
+
+            return $this->sendTemplate(
+                phone:        $phone,
+                templateName: 'lolos_pacer_br2026',
+                language:     config('qiscus.template_language', 'id'),
+                bodyParams: [
+                    ['type' => 'text', 'text' => $nama],
+            ]
+        );
+     }
+
     public function sendTidakLolosNotification(
         string $phoneNumber,
         string $nama
