@@ -74,7 +74,7 @@ class QiscusService
 
             return $this->sendTemplate(
                 phone:        $phone,
-                templateName: 'lolos_pacer_br2026',
+                templateName: 'pacer_lolos',
                 language:     config('qiscus.template_language', 'id'),
                 bodyParams: [
                     ['type' => 'text', 'text' => $nama],
