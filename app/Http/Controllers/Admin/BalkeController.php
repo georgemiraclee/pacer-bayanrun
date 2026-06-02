@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class BalkeController extends Controller
 {
-    private const TEMPLATE_NAME = 'balke_test_bayanrun';
+    private const TEMPLATE_NAME = 'information_balke_test';
 
     public function __construct(private QiscusService $qiscus) {}
 
@@ -385,15 +385,12 @@ class BalkeController extends Controller
     {
         $phone = $this->qiscus->normalizePhone($candidate->no_wa);
 
-        // Template balke_test hanya punya 2 parameter:
-        // {{1}} = nama, {{2}} = waktu (tanggal sudah hardcode di template)
         return $this->qiscus->sendTemplate(
             phone:        $phone,
             templateName: self::TEMPLATE_NAME,
             language:     config('qiscus.template_language', 'id'),
             bodyParams: [
                 ['type' => 'text', 'text' => $candidate->nama],
-                ['type' => 'text', 'text' => ($candidate->jam_balke ?? '—') . ' WITA'],
             ],
         );
     }

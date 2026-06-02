@@ -19,7 +19,10 @@ class AdminController extends Controller
     public function loginForm()
     {
         if (Auth::guard('admin')->check()) return redirect()->route('admin.dashboard');
-        return view('admin.login');
+        
+        return response()->view('admin.login')
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache');
     }
 
     public function login(Request $request)
